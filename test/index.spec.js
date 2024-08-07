@@ -61,17 +61,17 @@ describe('@hackolade/fetch library', () => {
 
   after(() => stopServer());
 
-  it('should reach the server from the main process', async () => {
+  it('should reach the server from the main process through a direct connection', async () => {
     await startElectronApp();
     assertServerReachedFrom('main');
   });
 
-  it('should reach the server from the renderer process', async () => {
+  it('should reach the server from the renderer process through a direct connection', async () => {
     await startElectronApp();
     assertServerReachedFrom('renderer');
   });
 
-  it('should reach the server from the utility process', async () => {
+  it('should reach the server from the utility process through a direct connection', async () => {
     await startElectronApp();
     assertServerReachedFrom('utility');
   });
