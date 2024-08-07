@@ -52,7 +52,7 @@ describe('@hackolade/fetch library', () => {
     appProcess.kill();
   }
 
-  function assertServerReachedBy(initiator) {
+  function assertServerReachedFrom(initiator) {
     assert.ok(initiators.includes(initiator));
   }
 
@@ -64,11 +64,11 @@ describe('@hackolade/fetch library', () => {
 
   it('should reach the server from the main process', async () => {
     await startElectronApp();
-    assertServerReachedBy('main');
+    assertServerReachedFrom('main');
   });
 
   it('should reach the server from the renderer process', async () => {
     await startElectronApp();
-    assertServerReachedBy('renderer');
+    assertServerReachedFrom('renderer');
   });
 });
