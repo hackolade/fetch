@@ -1,7 +1,3 @@
-import debug from 'debug';
-
-const log = debug('hck').extend('fetch');
-
 type FetchParameters =
   | Parameters<typeof Electron.net.fetch>
   | Parameters<typeof globalThis.fetch>;
@@ -14,14 +10,14 @@ type FetchReturnType<P> = P extends Parameters<typeof Electron.net.fetch>
  * @see https://www.electronjs.org/docs/latest/api/process#processtype-readonly
  */
 function isElectronMain(): boolean {
-  return process?.type === 'browser';
+  return globalThis.process?.type === 'browser';
 }
 
 /**
  * @see https://www.electronjs.org/docs/latest/api/process#processtype-readonly
  */
 function isElectronUtilityProcess(): boolean {
-  return process?.type === 'utility';
+  return globalThis.process?.type === 'utility';
 }
 
 /**
@@ -39,7 +35,6 @@ function useElectronNet(
 async function fetchUsingElectronNet(
   params: Parameters<typeof Electron.net.fetch>
 ): ReturnType<typeof Electron.net.fetch> {
-  log('using fetch() from Electron net');
   const { net } = await import('electron');
   return net.fetch(...params);
 }
@@ -50,7 +45,6 @@ async function fetchUsingElectronNet(
 async function fetchUsingGlobalContext(
   params: Parameters<typeof globalThis.fetch>
 ): ReturnType<typeof globalThis.fetch> {
-  log('using fetch() from global context');
   if (typeof globalThis.fetch !== 'function') {
     throw new Error('fetch() is not available on the global context!');
   }
@@ -64,3 +58,5 @@ export function hckFetch<P extends FetchParameters>(
     ? fetchUsingElectronNet(params)
     : fetchUsingGlobalContext(params);
 }
+
+globalThis.hckFetch = hckFetch;
