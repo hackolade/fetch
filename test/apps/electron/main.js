@@ -1,4 +1,3 @@
-const debug = require('debug');
 const { app, BrowserWindow } = require('electron');
 const { hckFetch } = require('../../../dist/cjs/index.cjs');
 
