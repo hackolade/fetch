@@ -1,0 +1,24 @@
+{
+  "name": "@hackolade/fetch",
+  "version": "1.0.0",
+  "description": "A HTTP client that works in the browser and in Electron",
+  "main": "./dist/cjs/index.cjs",
+  "module": "./dist/esm/index.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "swc -C module.type=es6 ./src -o ./dist/esm/index.mjs && swc -C module.type=commonjs ./src -o ./dist/cjs/index.cjs"
+  },
+  "peerDependencies": {
+    "electron": ">=31"
+  },
+  "devDependencies": {
+    "@swc/cli": "^0.4.0",
+    "@swc/core": "^1.7.6",
+    "electron": "^31.3.1"
+  }
+}
