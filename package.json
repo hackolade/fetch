@@ -11,7 +11,9 @@
     }
   },
   "scripts": {
-    "build": "swc -C module.type=es6 ./src -o ./dist/esm/index.mjs && swc -C module.type=commonjs ./src -o ./dist/cjs/index.cjs"
+    "build": "swc -C module.type=es6 ./src -o ./dist/esm/index.mjs && swc -C module.type=commonjs ./src -o ./dist/cjs/index.cjs",
+    "test": "npm run build && DEBUG=hck:* node --test ./test/*.spec.js",
+    "test:app:electron": "electron ./test/apps/electron/main.js"
   },
   "peerDependencies": {
     "electron": ">=31"
@@ -19,6 +21,10 @@
   "devDependencies": {
     "@swc/cli": "^0.4.0",
     "@swc/core": "^1.7.6",
-    "electron": "^31.3.1"
+    "electron": "^31.3.1",
+    "express": "^4.19.2"
+  },
+  "dependencies": {
+    "debug": "^4.3.6"
   }
 }
