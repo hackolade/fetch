@@ -19,7 +19,6 @@ describe('@hackolade/fetch library', () => {
       initiators.push(initiator);
       res.status(200).end();
     };
-    app.get('/browser', ok('browser'));
     app.get('/main', ok('main'));
     app.get('/renderer', ok('renderer'));
     app.get('/utility', ok('utility'));
