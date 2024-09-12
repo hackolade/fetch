@@ -46,7 +46,7 @@ async function fetchUsingGlobalContext(
   params: Parameters<typeof globalThis.fetch>
 ): ReturnType<typeof globalThis.fetch> {
   if (typeof globalThis.fetch !== 'function') {
-    throw new Error('fetch() is not available on the global context!');
+    throw new Error('fetch() is not available in the global context!');
   }
   return globalThis.fetch(...params);
 }
