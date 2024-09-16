@@ -22,6 +22,10 @@ function startServer() {
     res.status(200).end();
   });
 
+  app.get('/status', (_, res) => {
+    res.status(200).end();
+  });
+
   app.get('/reset', (_, res) => {
     log('resetting server');
     initiators.clear();

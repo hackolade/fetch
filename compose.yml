@@ -1,11 +1,35 @@
 services:
+
+  server: 
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: hck-fetch-test-server
+    init: true
+    expose:
+      - 3000
+    networks:
+      - internet
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'sh',
+          '-exec',
+          'curl -sSL --fail localhost:3000/status',
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 5
+      start_period: 1s
+
   proxy:
     image: hackolade.azurecr.io/squid-proxy:latest
     init: true
     entrypoint: /apps/squid/sbin/squid
     command: --foreground
-    ports:
-      - 3128:3128
+    expose:
+      - 3128
     networks:
       - intranet
       - internet
@@ -34,8 +58,22 @@ services:
       - HTTP_PROXY=proxy:3128
       - HTTPS_PROXY=proxy:3128
     depends_on:
+      server:
+        condition: service_healthy
       proxy:
         condition: service_healthy
+
+  tests: 
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: hck-fetch-tests
+    init: true
+    networks:
+      - internet
+    depends_on:
+      app:
+        condition: service_completed_successfully
 
 networks:
   intranet:

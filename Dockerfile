@@ -12,9 +12,10 @@ ENV UID=${ROOT_UID}
 ENV XDG_RUNTIME_DIR=/run/user/${UID}
 ENV DBUS_SESSION_BUS_ADDRESS=unix:path=${XDG_RUNTIME_DIR}/bus
 ENV DISPLAY=":99"
+ENV DEBUG=hck-fetch*
 
 SHELL [ "/bin/bash", "-e", "-o", "pipefail", "-c"  ]
-
+ENTRYPOINT [ "/src/hck/entrypoint.sh" ]
 RUN --mount=type=cache,id=apt-cache-${TARGETARCH},sharing=locked,target=/var/cache/apt \
     --mount=type=cache,id=apt-lib-${TARGETARCH},sharing=locked,target=/var/lib/apt <<EOF
 
@@ -32,18 +33,14 @@ RUN --mount=type=cache,id=apt-cache-${TARGETARCH},sharing=locked,target=/var/cac
         xvfb
 EOF
 
-# Install NPM dependencies
+# Install NPM dependencies and embed source code
 FROM electron-runtime AS hck-fetch-runtime
-COPY ./package.json ./package-lock.json /src/hck/
 WORKDIR /src/hck
+COPY ./package.json ./package-lock.json /src/hck/
 RUN --mount=type=cache,id=npm-cache,target=/root/.npm <<EOF
     mkdir node_modules
     npm ci --no-audit --no-fund --no-progress
 EOF
-
-# Embed source code
-FROM hck-fetch-runtime AS hck-fetch
-ENTRYPOINT [ "/src/hck/entrypoint.sh" ]
 COPY ./ /src/hck/
 RUN <<EOF
     chmod +x /src/hck/entrypoint.sh
@@ -51,5 +48,13 @@ RUN <<EOF
 EOF
 
 # Start test application
-FROM hck-fetch AS hck-fetch-test-app
+FROM hck-fetch-runtime AS hck-fetch-test-app
 CMD [ "/src/hck/node_modules/electron/dist/electron", "--no-sandbox", "/src/hck/test/resources/electron-app/main.js" ]
+
+# Start test server
+FROM hck-fetch-runtime AS hck-fetch-test-server
+CMD [ "npm", "run", "test:server" ]
+
+# Start tests
+FROM hck-fetch-runtime AS hck-fetch-tests
+ENTRYPOINT [ "npm", "run", "test" ]
