@@ -42,7 +42,7 @@ describe('@hackolade/fetch library', () => {
   }
 
   async function startElectronApp() {
-    const appProcess = spawn('npm', ['run', 'test:app:electron'], {
+    const appProcess = spawn('npm', ['run', 'test:app'], {
       cwd: resolve(__dirname, '..'),
     });
     appProcess.stdout.on('data', (data) => log('STDOUT: %o', data.toString()));

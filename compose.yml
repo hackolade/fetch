@@ -1,0 +1,46 @@
+services:
+  proxy:
+    image: hackolade.azurecr.io/squid-proxy:latest
+    init: true
+    entrypoint: /apps/squid/sbin/squid
+    command: --foreground
+    ports:
+      - 3128:3128
+    networks:
+      - intranet
+      - internet
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'sh',
+          '-exec',
+          'curl -sSL --fail -x localhost:3128 https://google.com',
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 5
+      start_period: 1s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: hck-fetch-test-app
+    init: true
+    networks:
+      - intranet
+    environment:
+      - HTTP_PROXY=proxy:3128
+      - HTTPS_PROXY=proxy:3128
+    depends_on:
+      proxy:
+        condition: service_healthy
+
+networks:
+  intranet:
+    name: hck-fetch-test-intranet
+    internal: true
+  internet:
+    name: hck-fetch-test-internet
+    driver: bridge

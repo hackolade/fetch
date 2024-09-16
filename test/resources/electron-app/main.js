@@ -2,6 +2,10 @@ const { app, BrowserWindow, utilityProcess } = require('electron');
 const path = require('path');
 const { hckFetch } = require('../../../dist/cjs/index.cjs');
 
+app.commandLine.appendSwitch('disable-gpu');
+app.commandLine.appendSwitch('enable-transparent-visuals');
+app.disableHardwareAcceleration();
+
 const createWindow = async () => {
   const win = new BrowserWindow({
     width: 800,

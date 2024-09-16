@@ -12,8 +12,12 @@
   },
   "scripts": {
     "build": "swc -C module.type=es6 ./src -o ./dist/esm/index.mjs && swc -C module.type=commonjs ./src -o ./dist/cjs/index.cjs",
+    "docker:build:app": "docker buildx build -t hackolade-fetch-test-app:latest --target hck-fetch-test-app .",
+    "docker:compose": "docker compose up --force-recreate --build",
+    "docker:run:app": "docker run -it hackolade-fetch-test-app:latest",
     "test": "npm run build && node --test ./test/*.spec.js",
-    "test:app:electron": "electron ./test/resources/electron-app/main.js"
+    "test:app": "electron ./test/resources/electron-app/main.js",
+    "test:compose:app+proxy": "npm run docker:compose -- app proxy"
   },
   "devDependencies": {
     "@swc/cli": "0.4.0",
