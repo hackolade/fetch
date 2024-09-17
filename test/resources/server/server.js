@@ -8,17 +8,20 @@ function startServer() {
   const app = express();
   const initiators = new Map();
   
-  app.get('/initiators/:initiator', (req, res) => {
-    const { initiator } = req.params;
-    const didSendRequest = initiators.has(initiator);
-    log('did receive a request from %o? %o', initiator, didSendRequest);
+  app.get('/initiators/:connectionType/:initiator', (req, res) => {
+    const { connectionType, initiator } = req.params;
+    const didSendRequest = !!initiators.get(connectionType)?.has(initiator);
+    log('did receive a request from %o/%o? %o', connectionType, initiator, didSendRequest);
     res.status(200).send({ didSendRequest });
   });
   
-  app.put('/initiators/:initiator', (req, res) => {
-    const { initiator } = req.params;
-    log('received request from %o', initiator);
-    initiators.set(initiator, true);
+  app.put('/initiators/:connectionType/:initiator', (req, res) => {
+    const { connectionType, initiator } = req.params;
+    log('received request from %o/%o', connectionType, initiator);
+    if (!initiators.has(connectionType)) {
+      initiators.set(connectionType, new Map());
+    }
+    initiators.get(connectionType).set(initiator, true);
     res.status(200).end();
   });
 
@@ -32,14 +35,7 @@ function startServer() {
     res.status(200).end();
   });
 
-  app.get('/stop', (_, res) => {
-    log('stopping server');
-    res.status(200).end();
-    server.close();
-    process.exit(0);
-  });
-
-  const server = app.listen(3000);
+  app.listen(3000);
   log('server is listening');
 }
 

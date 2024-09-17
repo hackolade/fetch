@@ -71,13 +71,13 @@ services:
     <<: *hck-fetch-test-app
     environment:
       - PORT=3001
-      - HTTP_PROXY=localhost:3128
-      - HTTPS_PROXY=localhost:3128
+      - SERVER_API_URL=http://localhost:3000/initiators/direct
 
   hck-fetch-test-app-proxy:
     <<: *hck-fetch-test-app
     environment:
       - PORT=3002
+      - SERVER_API_URL=http://hck-fetch-test-server:3000/initiators/proxy
       - HTTP_PROXY=localhost:3128
       - HTTPS_PROXY=localhost:3128
     

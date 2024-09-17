@@ -1,4 +1,6 @@
 (async function () {
   const { hckFetch } = await import('../../../dist/esm/index.mjs');
-  hckFetch('http://hck-fetch-test-server:3000/initiators/renderer', { method: 'PUT' });
+  const params = new URL(document.location).searchParams;
+  const serverApiUrl = params.get('serverApiUrl');
+  hckFetch(`${serverApiUrl}/renderer`, { method: 'PUT' });
 })();
