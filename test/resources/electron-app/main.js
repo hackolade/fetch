@@ -6,6 +6,12 @@ app.commandLine.appendSwitch('disable-gpu');
 app.commandLine.appendSwitch('enable-transparent-visuals');
 app.disableHardwareAcceleration();
 
+function wait(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 const createWindow = async () => {
   const win = new BrowserWindow({
     width: 800,
@@ -15,7 +21,12 @@ const createWindow = async () => {
 };
 
 app.whenReady().then(async () => {
-  await createWindow();
-  await hckFetch('http://hck-fetch-test-server:3000/initiators/main', { method: 'PUT' });
-  utilityProcess.fork(path.join(__dirname, 'utility.js'));
+  try {
+    await createWindow();
+    utilityProcess.fork(path.join(__dirname, 'utility.js'));
+    await hckFetch('http://hck-fetch-test-server:3000/initiators/main', { method: 'PUT' });
+  } finally {
+    await wait(1000);
+    app.exit(0);
+  }
 });
