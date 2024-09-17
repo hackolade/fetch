@@ -1,4 +1,5 @@
 const { app, BrowserWindow, utilityProcess } = require('electron');
+const express = require('express');
 const path = require('path');
 const { hckFetch } = require('../../../dist/cjs/index.cjs');
 
@@ -27,6 +28,14 @@ app.whenReady().then(async () => {
     await hckFetch('http://hck-fetch-test-server:3000/initiators/main', { method: 'PUT' });
   } finally {
     await wait(1000);
-    app.exit(0);
+    startServer();
   }
 });
+
+function startServer() {
+  const app = express();
+  app.get('/status', (_, res) => {
+    res.status(200).send({ status: 'OK' });
+  });
+  app.listen(3001);
+}

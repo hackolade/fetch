@@ -54,6 +54,18 @@ services:
     environment:
       - HTTP_PROXY=localhost:3128
       - HTTPS_PROXY=localhost:3128
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'sh',
+          '-exec',
+          'curl -sSL --fail localhost:3001/status',
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 5
+      start_period: 1s
     depends_on:
       hck-fetch-test-server:
         condition: service_healthy
@@ -67,4 +79,4 @@ services:
     network_mode: host
     depends_on:
       hck-fetch-test-app:
-        condition: service_completed_successfully
+        condition: service_healthy
