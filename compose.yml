@@ -44,17 +44,13 @@ services:
       hck-fetch-test-proxy:
         condition: service_healthy
 
-  hck-fetch-test-app:
+  hck-fetch-test-app: &hck-fetch-test-app
     build:
       context: .
       dockerfile: Dockerfile
       target: hck-fetch-test-app
     init: true
     network_mode: host 
-    environment:
-      - PORT=3001
-      - HTTP_PROXY=localhost:3128
-      - HTTPS_PROXY=localhost:3128
     healthcheck:
       test:
         [
@@ -71,6 +67,20 @@ services:
       hck-fetch-test-server:
         condition: service_healthy
 
+  hck-fetch-test-app-direct:
+    <<: *hck-fetch-test-app
+    environment:
+      - PORT=3001
+      - HTTP_PROXY=localhost:3128
+      - HTTPS_PROXY=localhost:3128
+
+  hck-fetch-test-app-proxy:
+    <<: *hck-fetch-test-app
+    environment:
+      - PORT=3002
+      - HTTP_PROXY=localhost:3128
+      - HTTPS_PROXY=localhost:3128
+    
   hck-fetch-tests: 
     build:
       context: .
@@ -79,5 +89,7 @@ services:
     init: true
     network_mode: host
     depends_on:
-      hck-fetch-test-app:
+      hck-fetch-test-app-direct:
+        condition: service_healthy
+      hck-fetch-test-app-proxy:
         condition: service_healthy

@@ -12,11 +12,9 @@
   },
   "scripts": {
     "build": "swc -C module.type=es6 ./src -o ./dist/esm/index.mjs && swc -C module.type=commonjs ./src -o ./dist/cjs/index.cjs",
-    "docker:app": "npm run docker:compose -- hck-fetch-test-app",
-    "docker:compose": "docker compose up --force-recreate --build",
-    "docker:server": "npm run docker:compose -- hck-fetch-test-server hck-fetch-test-proxy",
-    "docker:test:verbose": "npm run docker:compose -- --exit-code-from=hck-fetch-tests",
-    "docker:test": "npm run docker:test:verbose -- --attach=hck-fetch-tests --no-log-prefix",
+    "docker:compose": "docker compose up --build --force-recreate --always-recreate-deps",
+    "docker:server": "npm run docker:compose -- hck-fetch-test-server",
+    "docker:test": "npm run docker:compose -- hck-fetch-tests --exit-code-from=hck-fetch-tests --no-log-prefix",
     "test": "node --test ./test/*.spec.js",
     "test:app": "electron ./test/resources/electron-app/main.js",
     "test:server": "DEBUG=hck-fetch* node ./test/resources/server/server.js"
