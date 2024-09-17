@@ -23,7 +23,7 @@ function startServer() {
   });
 
   app.get('/status', (_, res) => {
-    res.status(200).end();
+    res.status(200).send({ status: 'OK' });
   });
 
   app.get('/reset', (_, res) => {

@@ -26,8 +26,8 @@ services:
       dockerfile: Dockerfile
       target: hck-fetch-test-server
     init: true
-    expose:
-      - 3000
+    ports:
+      - 3000:3000
     healthcheck:
       test:
         [
@@ -57,15 +57,14 @@ services:
     depends_on:
       hck-fetch-test-server:
         condition: service_healthy
-      hck-fetch-test-proxy:
-        condition: service_healthy
 
-#  tests: 
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#      target: hck-fetch-tests
-#    init: true
-#    depends_on:
-#      hck-fetch-test-app:
-#        condition: service_completed_successfully
+  hck-fetch-tests: 
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: hck-fetch-tests
+    init: true
+    network_mode: host
+    depends_on:
+      hck-fetch-test-app:
+        condition: service_completed_successfully
