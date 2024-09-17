@@ -16,6 +16,6 @@ const createWindow = async () => {
 
 app.whenReady().then(async () => {
   await createWindow();
-  await hckFetch('http://server:3000/initiators/main', { method: 'PUT' });
+  await hckFetch('http://hck-fetch-test-server:3000/initiators/main', { method: 'PUT' });
   utilityProcess.fork(path.join(__dirname, 'utility.js'));
 });

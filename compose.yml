@@ -1,38 +1,12 @@
 services:
 
-  server: 
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: hck-fetch-test-server
-    init: true
-    expose:
-      - 3000
-    networks:
-      - internet
-    healthcheck:
-      test:
-        [
-          'CMD',
-          'sh',
-          '-exec',
-          'curl -sSL --fail localhost:3000/status',
-        ]
-      interval: 2s
-      timeout: 2s
-      retries: 5
-      start_period: 1s
-
-  proxy:
+  hck-fetch-test-proxy:
     image: hackolade.azurecr.io/squid-proxy:latest
     init: true
     entrypoint: /apps/squid/sbin/squid
     command: --foreground
-    expose:
-      - 3128
-    networks:
-      - intranet
-      - internet
+    ports:
+      - 3128:3128
     healthcheck:
       test:
         [
@@ -46,39 +20,52 @@ services:
       retries: 5
       start_period: 1s
 
-  app:
+  hck-fetch-test-server: 
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: hck-fetch-test-server
+    init: true
+    expose:
+      - 3000
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'sh',
+          '-exec',
+          'curl -sSL --fail localhost:3000/status',
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 5
+      start_period: 1s
+    depends_on:
+      hck-fetch-test-proxy:
+        condition: service_healthy
+
+  hck-fetch-test-app:
     build:
       context: .
       dockerfile: Dockerfile
       target: hck-fetch-test-app
     init: true
-    networks:
-      - intranet
+    network_mode: host 
     environment:
-      - HTTP_PROXY=proxy:3128
-      - HTTPS_PROXY=proxy:3128
+      - HTTP_PROXY=localhost:3128
+      - HTTPS_PROXY=localhost:3128
     depends_on:
-      server:
+      hck-fetch-test-server:
         condition: service_healthy
-      proxy:
+      hck-fetch-test-proxy:
         condition: service_healthy
 
-  tests: 
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: hck-fetch-tests
-    init: true
-    networks:
-      - internet
-    depends_on:
-      app:
-        condition: service_completed_successfully
-
-networks:
-  intranet:
-    name: hck-fetch-test-intranet
-    internal: true
-  internet:
-    name: hck-fetch-test-internet
-    driver: bridge
+#  tests: 
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#      target: hck-fetch-tests
+#    init: true
+#    depends_on:
+#      hck-fetch-test-app:
+#        condition: service_completed_successfully
