@@ -52,6 +52,7 @@ services:
     init: true
     network_mode: host 
     environment:
+      - PORT=3001
       - HTTP_PROXY=localhost:3128
       - HTTPS_PROXY=localhost:3128
     healthcheck:
@@ -60,7 +61,7 @@ services:
           'CMD',
           'sh',
           '-exec',
-          'curl -sSL --fail localhost:3001/status',
+          'curl -sSL --fail localhost:$${PORT}/status',
         ]
       interval: 2s
       timeout: 2s

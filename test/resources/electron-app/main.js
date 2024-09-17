@@ -37,5 +37,5 @@ function startServer() {
   app.get('/status', (_, res) => {
     res.status(200).send({ status: 'OK' });
   });
-  app.listen(3001);
+  app.listen(process.env.PORT);
 }
