@@ -1,0 +1,95 @@
+services:
+
+  hck-fetch-test-proxy:
+    image: hackolade.azurecr.io/squid-proxy:latest
+    init: true
+    entrypoint: /apps/squid/sbin/squid
+    command: --foreground
+    ports:
+      - 3128:3128
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'sh',
+          '-exec',
+          'curl -sSL --fail -x localhost:3128 https://google.com',
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 5
+      start_period: 1s
+
+  hck-fetch-test-server: 
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: hck-fetch-test-server
+    init: true
+    ports:
+      - 3000:3000
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'sh',
+          '-exec',
+          'curl -sSL --fail localhost:3000/status',
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 5
+      start_period: 1s
+    depends_on:
+      hck-fetch-test-proxy:
+        condition: service_healthy
+
+  hck-fetch-test-app: &hck-fetch-test-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: hck-fetch-test-app
+    init: true
+    network_mode: host 
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'sh',
+          '-exec',
+          'curl -sSL --fail localhost:$${PORT}/status',
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 5
+      start_period: 1s
+    depends_on:
+      hck-fetch-test-server:
+        condition: service_healthy
+
+  hck-fetch-test-app-direct:
+    <<: *hck-fetch-test-app
+    environment:
+      - PORT=3001
+      - SERVER_API_URL=http://localhost:3000/initiators/direct
+
+  hck-fetch-test-app-proxy:
+    <<: *hck-fetch-test-app
+    environment:
+      - PORT=3002
+      - SERVER_API_URL=http://hck-fetch-test-server:3000/initiators/proxy
+      - HTTP_PROXY=localhost:3128
+      - HTTPS_PROXY=localhost:3128
+    
+  hck-fetch-tests: 
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: hck-fetch-tests
+    init: true
+    network_mode: host
+    depends_on:
+      hck-fetch-test-app-direct:
+        condition: service_healthy
+      hck-fetch-test-app-proxy:
+        condition: service_healthy
