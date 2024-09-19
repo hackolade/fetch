@@ -1,4 +1,6 @@
 configs:
+  squid:
+    file: ./test/resources/proxy/squid.conf
   squid-basic-auth:
     file: ./test/resources/proxy/squid-basic-auth.conf
 
@@ -6,7 +8,10 @@ services:
 
   hck-fetch-test-proxy: &hck-fetch-test-proxy
     profiles: [test]
-    image: hackolade.azurecr.io/squid-proxy:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: hck-fetch-test-proxy
     init: true
     entrypoint: /apps/squid/sbin/squid
     command: -N
@@ -14,6 +19,9 @@ services:
       - 3128:3128
     environment:
       - HEALTH_CHECK_PROXY_URL=localhost:3128
+    configs:
+      - source: squid
+        target: /etc/squid/squid.conf
     healthcheck:
       test:
         [
@@ -102,8 +110,8 @@ services:
     environment:
       - PORT=3002
       - SERVER_API_URL=http://hck-fetch-test-server:3000/initiators/proxy
-      - HTTP_PROXY=localhost:3128
-      - HTTPS_PROXY=localhost:3128
+      - HTTP_PROXY=http://localhost:3128
+      - HTTPS_PROXY=http://localhost:3128
 
   hck-fetch-test-app-proxy-basic-auth:
     <<: *hck-fetch-test-app
@@ -111,8 +119,8 @@ services:
     environment:
       - PORT=3003
       - SERVER_API_URL=http://hck-fetch-test-server:3000/initiators/proxy-basic-auth
-      - HTTP_PROXY=localhost:3129
-      - HTTPS_PROXY=localhost:3129
+      - HTTP_PROXY=http://user1:user1@localhost:3129
+      - HTTPS_PROXY=http://user1:user1@localhost:3129
     
   hck-fetch-tests:
     profiles: [test]

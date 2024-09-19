@@ -17,6 +17,8 @@
     "docker:test": "npm run docker:compose -- --exit-code-from=hck-fetch-tests --wait-timeout=120",
     "test": "node --test ./test/*.spec.js",
     "test:app": "electron ./test/resources/electron-app/main.js",
+    "test:app:direct": "PORT=3001 SERVER_API_URL=http://localhost:3000/initiators/direct npm run test:app",
+    "test:app:proxy": "PORT=3002 SERVER_API_URL=http://hck-fetch-test-server:3000/initiators/proxy npm run test:app",
     "test:server": "DEBUG=hck-fetch* node ./test/resources/server/server.js"
   },
   "devDependencies": {
