@@ -6,7 +6,7 @@ configs:
 
 services:
 
-  hck-fetch-test-proxy: &hck-fetch-test-proxy
+  proxy: &proxy
     profiles: [test]
     build:
       context: .
@@ -35,8 +35,8 @@ services:
       retries: 5
       start_period: 1s
 
-  hck-fetch-test-proxy-basic-auth:
-    <<: *hck-fetch-test-proxy
+  proxy-basic-auth:
+    <<: *proxy
     command: -N -f /etc/squid/squid.conf
     ports:
       - 3129:3128
@@ -46,7 +46,7 @@ services:
       - source: squid-basic-auth
         target: /etc/squid/squid.conf
 
-  hck-fetch-test-server:
+  server:
     profiles: [test]
     build:
       context: .
@@ -68,12 +68,12 @@ services:
       retries: 5
       start_period: 1s
     depends_on:
-      hck-fetch-test-proxy:
+      proxy:
         condition: service_healthy
-      hck-fetch-test-proxy-basic-auth:
+      proxy-basic-auth:
         condition: service_healthy
 
-  hck-fetch-test-app: &hck-fetch-test-app
+  app: &app
     profiles: [template]
     build:
       context: .
@@ -94,35 +94,35 @@ services:
       retries: 5
       start_period: 1s
     depends_on:
-      hck-fetch-test-server:
+      server:
         condition: service_healthy
 
-  hck-fetch-test-app-direct:
-    <<: *hck-fetch-test-app
+  app-direct:
+    <<: *app
     profiles: [test]
     environment:
       - PORT=3001
       - SERVER_API_URL=http://localhost:3000/initiators/direct
 
-  hck-fetch-test-app-proxy:
-    <<: *hck-fetch-test-app
+  app-proxy:
+    <<: *app
     profiles: [test]
     environment:
       - PORT=3002
-      - SERVER_API_URL=http://hck-fetch-test-server:3000/initiators/proxy
+      - SERVER_API_URL=http://server:3000/initiators/proxy
       - HTTP_PROXY=http://localhost:3128
       - HTTPS_PROXY=http://localhost:3128
 
-  hck-fetch-test-app-proxy-basic-auth:
-    <<: *hck-fetch-test-app
+  app-proxy-basic-auth:
+    <<: *app
     profiles: [test]
     environment:
       - PORT=3003
-      - SERVER_API_URL=http://hck-fetch-test-server:3000/initiators/proxy-basic-auth
+      - SERVER_API_URL=http://server:3000/initiators/proxy-basic-auth
       - HTTP_PROXY=http://user1:user1@localhost:3129
       - HTTPS_PROXY=http://user1:user1@localhost:3129
     
-  hck-fetch-tests:
+  tests:
     profiles: [test]
     build:
       context: .
@@ -132,9 +132,9 @@ services:
     network_mode: host
     tty: true
     depends_on:
-      hck-fetch-test-app-direct:
+      app-direct:
         condition: service_healthy
-      hck-fetch-test-app-proxy:
+      app-proxy:
         condition: service_healthy
-      hck-fetch-test-app-proxy-basic-auth:
+      app-proxy-basic-auth:
         condition: service_healthy
