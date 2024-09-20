@@ -14,7 +14,7 @@ services:
       target: hck-fetch-test-proxy
     init: true
     entrypoint: /apps/squid/sbin/squid
-    command: -N
+    command: -N -f /etc/squid/squid.conf
     ports:
       - 3128:3128
     environment:
@@ -37,7 +37,6 @@ services:
 
   proxy-basic-auth:
     <<: *proxy
-    command: -N -f /etc/squid/squid.conf
     ports:
       - 3129:3128
     environment:
