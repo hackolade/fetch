@@ -11,7 +11,6 @@ function startServer() {
   app.get('/initiators/:connectionType/:initiator', (req, res) => {
     const { connectionType, initiator } = req.params;
     const didSendRequest = !!initiators.get(connectionType)?.has(initiator);
-    log('did receive a request from %o? %o', `${connectionType}/${initiator}`, didSendRequest);
     res.status(200).send({ didSendRequest });
   });
   

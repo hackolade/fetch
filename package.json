@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": "swc -C module.type=es6 ./src -o ./dist/esm/index.mjs && swc -C module.type=commonjs ./src -o ./dist/cjs/index.cjs",
-    "docker:compose": "docker compose --profile=test up --build --force-recreate --always-recreate-deps --remove-orphans",
+    "docker:compose": "docker compose --profile=test up --build --force-recreate --always-recreate-deps --attach-dependencies --remove-orphans",
     "docker:server": "npm run docker:compose -- server",
     "docker:test": "npm run docker:compose -- --exit-code-from=tests --wait-timeout=120",
     "test": "node --test ./test/*.spec.js",
