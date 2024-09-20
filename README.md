@@ -21,18 +21,59 @@ This library returns the proper implementation of *fetch()* depending on the run
 
 > **INFO**: execute `npm run docker:test` to run the tests in Docker/Linux
 
-We have automated tests in order to verify that this HTTP client behaves as expected in various situations:
+We have automated tests in order to verify that this library behaves as expected in various situations:
 
 - in both the `main` process, a `renderer` process and a `utility` process
 - when connecting directly to the server
 - when connecting to the server through a proxy that is configured in the operating system
-- etc.
+- when connecting to the server through a proxy that requires basic authentication
 
 Those tests involve multiple components:
 
-- There is a custom `server` that exposes a REST API where clients can register themselves. That server is started as a Docker container. It opens a port on the host to allow direct access.
-- There is a `proxy` that is started as a Docker container. It opens a port on the host to provide access to the `server` based on its name within the Docker network. That name is only reachable within the Docker network, aka through the proxy.
-- There is an Electron `app`. It queries the API of the `server` from both the `main` process, a `renderer` process and a `utility` process. Each process registers itself through the API.
-- There are `tests` that queries the API of the `server` to verify that all clients could successfully register themselves, whatever the configuration of the connection.
+- There is a `server` that exposes a REST API where clients can register themselves. It opens a port on the host to allow direct access.
+- There are `proxies` with various configurations. They each open a different port on the host to provide access to the `server` based on its name within the Docker network. That name is only reachable within the Docker network, aka through one of the proxies.
+- There is an Electron `app`. It queries the API of the `server` from both the `main` process, a `renderer` process and a `utility` process. Each process registers itself through the API of the `server`.
+- There are `tests` that queries the API of the `server` to verify that all clients could successfully register themselves, whatever the context of the connection.
 
 We use Docker `compose` to orchestrate those components.
+
+## Observations
+
+### Direct connection
+
+Connecting directly to the server works as expected from all Electron processes.
+
+### Connection through a proxy
+
+Connecting to the server through the proxy that is configured in the operating system works as expected from all Electron processes.
+
+### Connection through a proxy with basic auth
+
+Connecting to the server through the proxy that is configured in the operating system requires some attention when basic authentication is involved.
+Even though the credentials might have been set at the level of the operating system, the user needs to provide them interactively to Electron.
+This is the case for apps such as Slack or Docker Desktop.
+
+The `main` process must handle the [login](https://www.electronjs.org/docs/latest/api/app#event-login) event and prompt the user for the proxy credentials.
+
+```js
+const { app } = require('electron');
+
+app.on('login', (event, webContents, details, authInfo, callback) => {
+  // Prevent the default behavior since it cancels all authentications.
+  event.preventDefault();
+
+  // Prompt the user for credentials
+  // ...
+
+  callback(username, password);
+});
+```
+
+The `login` handler will be called automatically for both the `main` process and a `renderer` process.
+For a `utility` process, the option [respondToAuthRequestsFromMainProcess](https://www.electronjs.org/docs/latest/api/utility-process#utilityprocessforkmodulepath-args-options) must be set to `true` when creating it.
+
+```js
+const { utilityProcess } = require('electron');
+
+utilityProcess.fork(..., { respondToAuthRequestsFromMainProcess: true });
+```
