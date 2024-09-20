@@ -37,6 +37,8 @@ Those tests involve multiple components:
 
 We use Docker `compose` to orchestrate those components.
 
+![diagram](./doc/test-components.drawio.svg)
+
 ## Observations
 
 ### Direct connection
