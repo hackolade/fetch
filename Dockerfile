@@ -59,7 +59,7 @@ CMD [ "npm", "run", "test:server" ]
 FROM hck-fetch-runtime AS hck-fetch-tests
 ENTRYPOINT [ "npm", "run", "test" ]
 
-# Extend Squid image to be allowed to log to stdout
+# Extend Squid image to log to stdout
 FROM hackolade.azurecr.io/squid-proxy:latest AS hck-fetch-test-proxy
 RUN chown -R proxy:proxy /apps
 USER proxy
