@@ -39,12 +39,17 @@ const createWindow = async () => {
 app.whenReady().then(async () => {
   try {
     await createWindow();
-    utilityProcess.fork(path.join(__dirname, 'utility.js'), [SERVER_API_URL]);
+    utilityProcess.fork(path.join(__dirname, 'utility.js'), [SERVER_API_URL], { respondToAuthRequestsFromMainProcess: true });
     await hckFetch(`${SERVER_API_URL}/main`, { method: 'PUT' });
   } finally {
     await wait(1000);
     startServer();
   }
+});
+
+app.on('login', (event, webContents, details, authInfo, callback) => {
+  event.preventDefault();
+  callback('user1', 'user1');
 });
 
 function startServer() {
