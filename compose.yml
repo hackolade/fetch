@@ -1,26 +1,52 @@
+configs:
+  squid:
+    file: ./test/resources/proxy/squid.conf
+  squid-basic-auth:
+    file: ./test/resources/proxy/squid-basic-auth.conf
+
 services:
 
-  hck-fetch-test-proxy:
-    image: hackolade.azurecr.io/squid-proxy:latest
+  proxy: &proxy
+    profiles: [test]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: hck-fetch-test-proxy
     init: true
     entrypoint: /apps/squid/sbin/squid
-    command: --foreground
+    command: -N -f /etc/squid/squid.conf
     ports:
       - 3128:3128
+    environment:
+      - HEALTH_CHECK_PROXY_URL=localhost:3128
+    configs:
+      - source: squid
+        target: /etc/squid/squid.conf
     healthcheck:
       test:
         [
           'CMD',
           'sh',
           '-exec',
-          'curl -sSL --fail -x localhost:3128 https://google.com',
+          'curl -sSL --fail -x $${HEALTH_CHECK_PROXY_URL} https://hackolade.com',
         ]
       interval: 2s
       timeout: 2s
       retries: 5
       start_period: 1s
 
-  hck-fetch-test-server: 
+  proxy-basic-auth:
+    <<: *proxy
+    ports:
+      - 3129:3128
+    environment:
+      - HEALTH_CHECK_PROXY_URL=http://user1:user1@localhost:3128
+    configs:
+      - source: squid-basic-auth
+        target: /etc/squid/squid.conf
+
+  server:
+    profiles: [test]
     build:
       context: .
       dockerfile: Dockerfile
@@ -41,10 +67,13 @@ services:
       retries: 5
       start_period: 1s
     depends_on:
-      hck-fetch-test-proxy:
+      proxy:
+        condition: service_healthy
+      proxy-basic-auth:
         condition: service_healthy
 
-  hck-fetch-test-app: &hck-fetch-test-app
+  app: &app
+    profiles: [template]
     build:
       context: .
       dockerfile: Dockerfile
@@ -64,32 +93,47 @@ services:
       retries: 5
       start_period: 1s
     depends_on:
-      hck-fetch-test-server:
+      server:
         condition: service_healthy
 
-  hck-fetch-test-app-direct:
-    <<: *hck-fetch-test-app
+  app-direct:
+    <<: *app
+    profiles: [test]
     environment:
       - PORT=3001
       - SERVER_API_URL=http://localhost:3000/initiators/direct
 
-  hck-fetch-test-app-proxy:
-    <<: *hck-fetch-test-app
+  app-proxy:
+    <<: *app
+    profiles: [test]
     environment:
       - PORT=3002
-      - SERVER_API_URL=http://hck-fetch-test-server:3000/initiators/proxy
-      - HTTP_PROXY=localhost:3128
-      - HTTPS_PROXY=localhost:3128
+      - SERVER_API_URL=http://server:3000/initiators/proxy
+      - HTTP_PROXY=http://localhost:3128
+      - HTTPS_PROXY=http://localhost:3128
+
+  app-proxy-basic-auth:
+    <<: *app
+    profiles: [test]
+    environment:
+      - PORT=3003
+      - SERVER_API_URL=http://server:3000/initiators/proxy-basic-auth
+      - HTTP_PROXY=http://user1:user1@localhost:3129
+      - HTTPS_PROXY=http://user1:user1@localhost:3129
     
-  hck-fetch-tests: 
+  tests:
+    profiles: [test]
     build:
       context: .
       dockerfile: Dockerfile
       target: hck-fetch-tests
     init: true
     network_mode: host
+    tty: true
     depends_on:
-      hck-fetch-test-app-direct:
+      app-direct:
         condition: service_healthy
-      hck-fetch-test-app-proxy:
+      app-proxy:
+        condition: service_healthy
+      app-proxy-basic-auth:
         condition: service_healthy

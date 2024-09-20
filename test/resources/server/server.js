@@ -11,13 +11,12 @@ function startServer() {
   app.get('/initiators/:connectionType/:initiator', (req, res) => {
     const { connectionType, initiator } = req.params;
     const didSendRequest = !!initiators.get(connectionType)?.has(initiator);
-    log('did receive a request from %o/%o? %o', connectionType, initiator, didSendRequest);
     res.status(200).send({ didSendRequest });
   });
   
   app.put('/initiators/:connectionType/:initiator', (req, res) => {
     const { connectionType, initiator } = req.params;
-    log('received request from %o/%o', connectionType, initiator);
+    log('received request from %o', `${connectionType}/${initiator}`);
     if (!initiators.has(connectionType)) {
       initiators.set(connectionType, new Map());
     }
