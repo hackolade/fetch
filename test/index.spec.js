@@ -3,7 +3,7 @@ const { describe, it } = require('node:test');
 
 describe('@hackolade/fetch library', () => {
 
-  const SERVER = 'http://0.0.0.0:3000';
+  const SERVER = 'http://0.0.0.0:8080';
 
   async function assertServerReachedFrom(connectionType, initiator) {
     const response = await fetch(`${SERVER}/initiators/${connectionType}/${initiator}`);
