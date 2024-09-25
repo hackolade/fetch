@@ -24,9 +24,10 @@ This library returns the proper implementation of *fetch()* depending on the run
 We have automated tests in order to verify that this library behaves as expected in various situations:
 
 - in both the `main` process, a `renderer` process and a `utility` process
-- when connecting directly to the server
-- when connecting to the server through a proxy that is configured in the operating system
-- when connecting to the server through a proxy that requires basic authentication
+- when connecting directly to a server
+- when connecting to a server that uses a self-signed certificate
+- when connecting to a server through a proxy that is configured in the operating system
+- when connecting to a server through a proxy that requires basic authentication
 
 Those tests involve multiple components:
 
