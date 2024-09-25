@@ -41,15 +41,30 @@ We use Docker `compose` to orchestrate those components.
 
 ## Observations
 
-### Direct connection
+### :white_check_mark: Direct connection
 
-Connecting directly to the server works as expected from all Electron processes.
+Connecting directly to a server works as expected from all Electron processes.
 
-### Connection through a proxy
+### :white_check_mark: Connection involving a self-signed certificate
+
+> **CONTEXT:** for a certificate to be considered valid, it must be signed by a trusted certificate authority (CA), such as *GlobalSign* or *DigiCert*.
+Obtaining such a certificate used to cost some money (this is not true anymore thanks to *[Let's Encrypt](https://letsencrypt.org/)*, a nonprofit certificate authority).
+That's why some organizations generated their own self-signed certificates, typically for internal use.
+Those certificates are free. However, they are invalid by default and prevent HTTPS connections from being securely established.
+To be able to use self-signed certificates, an organization must add itself to the list of trusted certificate authorities in the OS of all its users.
+
+Connecting to a server that uses a self-signed certificate works as expected from all Electron processes.
+Of course it requires the [root CA file](./test/resources/certs/gen/rootCA.crt) to be properly installed in the user's operating system.
+
+- MacOS: double-click on the root CA file and follow the instructions to add it to the *Keychain*
+- Windows: double-click on the root CA file and follow the instructions
+- Linux: see instructions [here](https://chromium.googlesource.com/chromium/src/+/master/docs/linux/cert_management.md) to add the root CA to the *NSS Shared DB*
+
+### :white_check_mark: Connection through a proxy
 
 Connecting to the server through the proxy that is configured in the operating system works as expected from all Electron processes.
 
-### Connection through a proxy with basic auth
+### :white_check_mark: Connection through a proxy with basic auth
 
 Connecting to the server through the proxy that is configured in the operating system requires some attention when basic authentication is involved.
 Even though the credentials might have been set at the level of the operating system, the user needs to provide them interactively to Electron.

@@ -23,6 +23,18 @@ describe('@hackolade/fetch library', () => {
     await assertServerReachedFrom('direct', 'utility');
   });
 
+  it('should reach the server that uses a self-signed certificate from the main process through a direct connection', async () => {
+    await assertServerReachedFrom('cert', 'main');
+  });
+
+  it('should reach the server that uses a self-signed certificate from the renderer process through a direct connection', async () => {
+    await assertServerReachedFrom('cert', 'renderer');
+  });
+
+  it('should reach the server that uses a self-signed certificate from the utility process through a direct connection', async () => {
+    await assertServerReachedFrom('cert', 'utility');
+  });
+
   it('should reach the server from the main process through a proxy', async () => {
     await assertServerReachedFrom('proxy', 'main');
   });

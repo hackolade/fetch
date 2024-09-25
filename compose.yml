@@ -104,11 +104,18 @@ services:
       - PORT=3001
       - SERVER_API_URL=http://localhost:8080/initiators/direct
 
-  app-proxy:
+  app-self-signed-cert:
     <<: *app
     profiles: [test]
     environment:
       - PORT=3002
+      - SERVER_API_URL=https://localhost:4443/initiators/cert
+
+  app-proxy:
+    <<: *app
+    profiles: [test]
+    environment:
+      - PORT=3003
       - SERVER_API_URL=http://server/initiators/proxy
       - HTTP_PROXY=http://localhost:3128
       - HTTPS_PROXY=http://localhost:3128
@@ -117,7 +124,7 @@ services:
     <<: *app
     profiles: [test]
     environment:
-      - PORT=3003
+      - PORT=3004
       - SERVER_API_URL=http://server/initiators/proxy-basic-auth
       - HTTP_PROXY=http://user1:user1@localhost:3129
       - HTTPS_PROXY=http://user1:user1@localhost:3129
@@ -133,6 +140,8 @@ services:
     tty: true
     depends_on:
       app-direct:
+        condition: service_healthy
+      app-self-signed-cert:
         condition: service_healthy
       app-proxy:
         condition: service_healthy
