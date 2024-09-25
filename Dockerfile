@@ -29,6 +29,7 @@ RUN --mount=type=cache,id=apt-cache-${TARGETARCH},sharing=locked,target=/var/cac
         libgbm1 \
         libgtk-3-0 \
         libnss3 \
+        libnss3-tools \
         xauth \
         xvfb
 EOF
@@ -50,6 +51,21 @@ EOF
 # Start test application
 FROM hck-fetch-runtime AS hck-fetch-test-app
 CMD [ "/src/hck/node_modules/electron/dist/electron", "--no-sandbox", "/src/hck/test/resources/electron-app/main.js" ]
+
+# Install root CA in order to accept self-signed certificates
+# See https://chromium.googlesource.com/chromium/src/+/master/docs/linux/cert_management.md
+COPY ./test/resources/certs/gen/rootCA.crt /usr/local/share/ca-certificates/
+RUN <<EOF
+    NSS_DB_LOCATION="$HOME/.pki/nssdb"
+    mkdir -p "$NSS_DB_LOCATION"
+    certutil -d "$NSS_DB_LOCATION" -N
+    certutil \
+        -d "sql:$NSS_DB_LOCATION" \
+        -A \
+        -t "C,," \
+        -n localhost \
+        -i /usr/local/share/ca-certificates/rootCA.crt
+EOF
 
 # Start test server
 FROM hck-fetch-runtime AS hck-fetch-test-server

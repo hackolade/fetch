@@ -3,7 +3,7 @@ const { describe, it } = require('node:test');
 
 describe('@hackolade/fetch library', () => {
 
-  const SERVER = 'http://0.0.0.0:3000';
+  const SERVER = 'http://0.0.0.0:8080';
 
   async function assertServerReachedFrom(connectionType, initiator) {
     const response = await fetch(`${SERVER}/initiators/${connectionType}/${initiator}`);
@@ -21,6 +21,18 @@ describe('@hackolade/fetch library', () => {
 
   it('should reach the server from the utility process through a direct connection', async () => {
     await assertServerReachedFrom('direct', 'utility');
+  });
+
+  it('should reach the server that uses a self-signed certificate from the main process through a direct connection', async () => {
+    await assertServerReachedFrom('cert', 'main');
+  });
+
+  it('should reach the server that uses a self-signed certificate from the renderer process through a direct connection', async () => {
+    await assertServerReachedFrom('cert', 'renderer');
+  });
+
+  it('should reach the server that uses a self-signed certificate from the utility process through a direct connection', async () => {
+    await assertServerReachedFrom('cert', 'utility');
   });
 
   it('should reach the server from the main process through a proxy', async () => {

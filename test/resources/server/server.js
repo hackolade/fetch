@@ -1,6 +1,11 @@
 const debug = require('debug');
 const express = require('express');
+const fs = require('fs');
+const https = require('https');
+const path = require('path');
 
+const HTTP_PORT = 80;
+const HTTPS_PORT = 443;
 const log = debug('hck-fetch').extend('test-server');
 
 function startServer() {
@@ -34,8 +39,20 @@ function startServer() {
     res.status(200).end();
   });
 
-  app.listen(3000);
-  log('server is listening');
+  app.listen(HTTP_PORT, () => {
+    log(`server is listening to incoming HTTP requests`);
+  });
+
+  const httpsOptions = {
+    key: fs.readFileSync(path.resolve(__dirname, '..', 'certs', 'gen', 'localhost.key')),
+    cert: fs.readFileSync(path.resolve(__dirname, '..', 'certs', 'gen', 'localhost.crt')),
+  };
+
+ const httpsServer = https.createServer(httpsOptions, app);
+
+  httpsServer.listen(HTTPS_PORT, () => {
+    log('server is listening to incoming HTTPS requests');
+  });
 }
 
 startServer();

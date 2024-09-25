@@ -53,14 +53,15 @@ services:
       target: hck-fetch-test-server
     init: true
     ports:
-      - 3000:3000
+      - 8080:80
+      - 4443:443
     healthcheck:
       test:
         [
           'CMD',
           'sh',
           '-exec',
-          'curl -sSL --fail localhost:3000/status',
+          'curl -sSL --fail localhost/status',
         ]
       interval: 2s
       timeout: 2s
@@ -101,14 +102,21 @@ services:
     profiles: [test]
     environment:
       - PORT=3001
-      - SERVER_API_URL=http://localhost:3000/initiators/direct
+      - SERVER_API_URL=http://localhost:8080/initiators/direct
+
+  app-self-signed-cert:
+    <<: *app
+    profiles: [test]
+    environment:
+      - PORT=3002
+      - SERVER_API_URL=https://localhost:4443/initiators/cert
 
   app-proxy:
     <<: *app
     profiles: [test]
     environment:
-      - PORT=3002
-      - SERVER_API_URL=http://server:3000/initiators/proxy
+      - PORT=3003
+      - SERVER_API_URL=http://server/initiators/proxy
       - HTTP_PROXY=http://localhost:3128
       - HTTPS_PROXY=http://localhost:3128
 
@@ -116,8 +124,8 @@ services:
     <<: *app
     profiles: [test]
     environment:
-      - PORT=3003
-      - SERVER_API_URL=http://server:3000/initiators/proxy-basic-auth
+      - PORT=3004
+      - SERVER_API_URL=http://server/initiators/proxy-basic-auth
       - HTTP_PROXY=http://user1:user1@localhost:3129
       - HTTPS_PROXY=http://user1:user1@localhost:3129
     
@@ -132,6 +140,8 @@ services:
     tty: true
     depends_on:
       app-direct:
+        condition: service_healthy
+      app-self-signed-cert:
         condition: service_healthy
       app-proxy:
         condition: service_healthy
