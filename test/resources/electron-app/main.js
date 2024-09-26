@@ -10,6 +10,9 @@ app.disableHardwareAcceleration();
 
 const log = debug('hck-fetch').extend('test-app');
 
+const PROXY_USERNAME = 'user1';
+const PROXY_PASSWORD = PROXY_USERNAME;
+
 const PORT = Number.parseInt(process.env.PORT);
 if (!PORT) {
   throw new Error(`Expected env.PORT to be a positive integer, got '${process.env.PORT}'!`)
@@ -49,7 +52,7 @@ app.whenReady().then(async () => {
 
 app.on('login', (event, webContents, details, authInfo, callback) => {
   event.preventDefault();
-  callback('user1', 'user1');
+  callback(PROXY_USERNAME, PROXY_PASSWORD);
 });
 
 function startServer() {

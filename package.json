@@ -12,13 +12,17 @@
   },
   "scripts": {
     "build": "swc -C module.type=es6 ./src -o ./dist/esm/index.mjs && swc -C module.type=commonjs ./src -o ./dist/cjs/index.cjs",
-    "docker:compose": "docker compose --profile=test up --build --force-recreate --always-recreate-deps --attach-dependencies --remove-orphans",
+    "docker:compose": "docker compose --profile=test up --build --force-recreate --always-recreate-deps --remove-orphans",
     "docker:server": "npm run docker:compose -- server",
+    "docker:server:verbose": "npm run docker:compose -- --attach-dependencies server",
     "docker:test": "npm run docker:compose -- --exit-code-from=tests --wait-timeout=120",
     "test": "node --test ./test/*.spec.js",
     "test:app": "electron ./test/resources/electron-app/main.js",
     "test:app:direct": "PORT=3001 SERVER_API_URL=http://localhost:8080/initiators/direct npm run test:app",
-    "test:app:proxy": "PORT=3002 SERVER_API_URL=http://server/initiators/proxy npm run test:app",
+    "test:app:cert": "PORT=3002 SERVER_API_URL=https://localhost:4443/initiators/cert npm run test:app",
+    "test:app:proxy": "PORT=3003 SERVER_API_URL=http://server:8080/initiators/proxy npm run test:app",
+    "test:app:proxy-basic-auth": "PORT=3004 SERVER_API_URL=http://server:8080/initiators/proxy-basic-auth npm run test:app",
+    "test:app:proxy-pac-file": "PORT=3005 SERVER_API_URL=http://server:8080/initiators/proxy-pac-file npm run test:app",
     "test:server": "DEBUG=hck-fetch* node ./test/resources/server/server.js"
   },
   "devDependencies": {

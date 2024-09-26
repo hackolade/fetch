@@ -17,59 +17,105 @@ This library returns the proper implementation of *fetch()* depending on the run
 - it returns the native [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) in a browser, as well as in a Electron `renderer` process
 - it returns [net.fetch](https://www.electronjs.org/docs/latest/api/net#netfetchinput-init) in the Electron `main` and `utility` processes
 
-## Tests
+## Tests components
 
-> **INFO**: execute `npm run docker:test` to run the tests in Docker/Linux
-
-We have automated tests in order to verify that this library behaves as expected in various situations:
+We need to test that this library behaves as expected in various situations, whatever the OS of the user:
 
 - in both the `main` process, a `renderer` process and a `utility` process
-- when connecting directly to a server
-- when connecting to a server that uses a self-signed certificate
-- when connecting to a server through a proxy that is configured in the operating system
+- when connecting directly to a server (aka when no proxy is involved)
+- when connecting to a server that uses a self-signed certificate whose authority has been installed in the trust store of the OS
+- when connecting to a server through a proxy that has been configured at the level of the OS
 - when connecting to a server through a proxy that requires basic authentication
+- when connecting to a server through the proxy returned by a [PAC file](https://en.wikipedia.org/wiki/Proxy_auto-config)
 
-Those tests involve multiple components:
+In order to perform those tests, we have prepared multiple components:
 
-- There is a `server` that exposes a REST API where clients can register themselves. It opens a port on the host to allow direct access.
-- There are `proxies` with various configurations. They each open a different port on the host to provide access to the `server` based on its name within the Docker network. That name is only reachable within the Docker network, aka through one of the proxies.
-- There is an Electron `app`. It queries the API of the `server` from both the `main` process, a `renderer` process and a `utility` process. Each process registers itself through the API of the `server`.
-- There are `tests` that queries the API of the `server` to verify that all clients could successfully register themselves, whatever the context of the connection.
-
-We use Docker `compose` to orchestrate those components.
+|Component|URL|Description|
+|-|-|-|
+|`server`|On your host (direct access): <br> http://localhost:8080 <br> https://localhost:4443 <br><br> In Docker network (access through proxy): http://server:8080 <br> https://server:4443|This server exposes the following REST endpoint: <br> `PUT /initiators/:connectionType/:initiator` <br> It allows clients to register themselves using arbitrary routes: <br> `/initiators/direct/main`, `initiators/proxy/renderer`, etc. <br><br> This server also exposes the following REST endpoint: <br> `GET /initiators/:connectionType/:initiator` <br> It can be used to check if a given client managed to reach the server to register itself.|
+|`app`|NA|This is an Electron application. It contacts the server from both the *main* process, a *renderer* process and a *utility* process. Each process registers itself as a distinct `:initiator`: `main`, `renderer` and `utility` respectively. The base URL of the endpoint - including the `:connectionType` - is passed to the application through an environment variable, making it possible to start different instances of the application to cover different cases (e.g. direct connection, connection through a proxy).|
+|`proxy`|http://localhost:3128|This is a proxy that does not require authentication.|
+|`proxy-basic-auth`|http://localhost:3129|This is a proxy that requires basic authentication. You can use `user1` as both username and password.|
+|PAC file|http://localhost:8081/proxy.pac|This is a PAC file that leads to using the proxy that does not require authentication.|
+|`tests`|NA|This is a set of tests that query the REST API of the server to verify that all clients could successfully register themselves, whatever the context of the connection.|
 
 ![diagram](./doc/test-components.drawio.svg)
 
-## Observations
+## Test pre-requisites
 
-### :white_check_mark: Direct connection
+Follow the instructions below prior to executing the tests:
 
-Connecting directly to a server works as expected from all Electron processes.
+- Install both `node/npm` and `docker`.
+- Run `npm install` in this repository.
 
-### :white_check_mark: Connection involving a self-signed certificate
+## Test automation
 
-> **CONTEXT:** for a certificate to be considered valid, it must be signed by a trusted certificate authority (CA), such as *GlobalSign* or *DigiCert*.
+If your OS is **Linux or MacOS**, then you can run the command below to execute the automated tests.
+
+```sh
+npm run docker:test
+```
+
+:warning: Those tests validate the behavior of the library in Docker/Linux. Validating the library for MacOS and Windows involve manual steps that are documented below.
+
+## Test direct connection
+
+In this case, the app connects directly to the server. There is no intermediate proxy involved.
+
+:white_check_mark: **Linux**: this case is covered by the automated tests.
+
+:white_check_mark: **MacOS**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Start the application with `npm run test:app:direct`.
+
+## Test connection involving a self-signed certificate
+
+For a certificate to be considered valid, it must be signed by a trusted certificate authority (CA), such as *GlobalSign* or *DigiCert*.
 Obtaining such a certificate used to cost some money (this is not true anymore thanks to *[Let's Encrypt](https://letsencrypt.org/)*, a nonprofit certificate authority).
 That's why some organizations generated their own self-signed certificates, typically for internal use.
-Those certificates are free. However, they are invalid by default and prevent HTTPS connections from being securely established.
+Those certificates are free.
+However, they are unsafe and prevent HTTPS connections from being established.
 To be able to use self-signed certificates, an organization must add itself to the list of trusted certificate authorities in the OS of all its users.
 
-Connecting to a server that uses a self-signed certificate works as expected from all Electron processes.
-Of course it requires the [root CA file](./test/resources/certs/gen/rootCA.crt) to be properly installed in the user's operating system.
+:white_check_mark: **Linux**: this case is covered by the automated tests. Note that the custom certificate authority must be added to the *NSS Shared DB* (see instructions [here](https://chromium.googlesource.com/chromium/src/+/master/docs/linux/cert_management.md)).
 
-- MacOS: double-click on the root CA file and follow the instructions to add it to the *Keychain*
-- Windows: double-click on the root CA file and follow the instructions
-- Linux: see instructions [here](https://chromium.googlesource.com/chromium/src/+/master/docs/linux/cert_management.md) to add the root CA to the *NSS Shared DB*
+:white_check_mark: **MacOS**: follow the instructions below.
 
-### :white_check_mark: Connection through a proxy
+1. Start the server with `npm run docker:server`.
+1. Open the MacOS *Keychain Access*.
+1. Click on *File* > *Import Items*.
+1. Select the certificate [./test/resources/certs/gen/rootCA.crt](./test/resources/certs/gen/rootCA.crt).
+1. Locate the certificate that you just imported in your keychain (it is named *Hackolade-Test-Root-CA*) and double click on it.
+1. In the *Trust* section of the details dialog, choose to *Always Trust* the certificate for SSL.
+1. Close the details dialog to apply your changes.
+1. Start the application with `npm run test:app:cert`.
+1. [Optional] You can remove the certificate from your keychain.
 
-Connecting to the server through the proxy that is configured in the operating system works as expected from all Electron processes.
+## Test connection through a proxy
 
-### :white_check_mark: Connection through a proxy with basic auth
+In this case, the app connects to the server through a proxy.
 
-Connecting to the server through the proxy that is configured in the operating system requires some attention when basic authentication is involved.
-Even though the credentials might have been set at the level of the operating system, the user needs to provide them interactively to Electron.
-This is the case for apps such as Slack or Docker Desktop.
+:white_check_mark: **Linux**: this case is covered by the automated tests. Note that the proxy is configured through the environment variables `HTTP_PROXY` and `HTTPS_PROXY`, which is the standard way of configuring proxies in Linux.
+
+:white_check_mark: **MacOS**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Open the MacOS *System Settings*.
+1. Select *Network* in the left menu.
+1. Navigate to the details of your network connection.
+1. In the details dialog, select *Proxies*.
+1. Enable *Web proxy (HTTP)* and provide the following settings:
+    - Server: *localhost*
+    - Port: *3128*
+    - No authentication required
+1. Click on *OK* to apply your changes.
+1. Start the application with `npm run test:app:proxy`.
+1. Turn off the proxy.
+
+## Test connection through a proxy that requires basic auth
+
+In this case, the app connects to the server through a proxy that requires a username and a password. Even though the credentials might have been set at the level of the operating system, the user needs to provide them interactively to the Electron application. Note that this is also the case for other apps such as Slack or Docker Desktop.
 
 The `main` process must handle the [login](https://www.electronjs.org/docs/latest/api/app#event-login) event and prompt the user for the proxy credentials.
 
@@ -95,3 +141,37 @@ const { utilityProcess } = require('electron');
 
 utilityProcess.fork(..., { respondToAuthRequestsFromMainProcess: true });
 ```
+
+:white_check_mark: **Linux**: this case is covered by the automated tests. Note that the proxy is configured through the environment variables `HTTP_PROXY` and `HTTPS_PROXY`, which is the standard way of configuring proxies in Linux.
+
+:white_check_mark: **MacOS**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Open the MacOS *System Settings*.
+1. Select *Network* in the left menu.
+1. Navigate to the details of your network connection.
+1. In the details dialog, select *Proxies*.
+1. Enable *Web proxy (HTTP)* and provide the following settings:
+    - Server: *localhost*
+    - Port: *3128*
+    - Username: *user1*
+    - Password: *user1*
+1. Click on *OK* to apply your changes.
+1. Start the application with `npm run test:app:proxy-basic-auth`. Note that you won't be prompted for credentials because we hardcoded them.
+1. Turn off the proxy.
+
+## Test connection through a proxy configured via a PAC file
+
+:warning: **Linux**: PAC files are not natively supported by Linux, aka you cannot set `HTTP_PROXY` or `HTTPS_PROXY` to the URL of a PAC file. Linux requires the application itself to provide support for PAC files. That's because PAC files were originally meant to be used by browsers (see [here](https://en.wikipedia.org/wiki/Proxy_auto-config)). That's why they are JavaScript files.
+
+:white_check_mark: **MacOS**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Open the MacOS *System Settings*.
+1. Select *Network* in the left menu.
+1. Navigate to the details of your network connection.
+1. In the details dialog, select *Proxies*.
+1. Enable *Auto proxy configuration* and provide the following URL: *http://localhost:8081/proxy.pac*.
+1. Click on *OK* to apply your changes.
+1. Start the application with `npm run test:app:proxy-pac-file`. Note that you won't be prompted for credentials because we hardcoded them.
+1. Turn off the proxy.

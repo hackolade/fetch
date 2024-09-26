@@ -4,8 +4,8 @@ const fs = require('fs');
 const https = require('https');
 const path = require('path');
 
-const HTTP_PORT = 80;
-const HTTPS_PORT = 443;
+const HTTP_PORT = 8080;
+const HTTPS_PORT = 4443;
 const log = debug('hck-fetch').extend('test-server');
 
 function startServer() {
