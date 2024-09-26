@@ -68,7 +68,7 @@ See next sections for more details...
 |Self-signed certificate|:white_check_mark:|:white_check_mark:|:question:|
 |Proxy|:white_check_mark:|:white_check_mark:|:question:|
 |Proxy with basic auth|:white_check_mark:|:white_check_mark:|:question:|
-|PAC file|:warning|:white_check_mark:|:question:|
+|PAC file|:warning:|:white_check_mark:|:question:|
 
 ## Test direct connection
 
