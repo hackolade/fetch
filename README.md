@@ -48,7 +48,7 @@ Follow the instructions below prior to executing the tests:
 - Install both `node/npm` and `docker`.
 - Run `npm install` in this repository.
 
-## Test execution
+## Test automation
 
 If your OS is **Linux or MacOS**, then you can run the command below to execute the automated tests.
 
@@ -58,7 +58,7 @@ npm run docker:test
 
 :warning: Those tests validate the behavior of the library in Docker/Linux. Validating the library for MacOS and Windows involve manual steps that are documented below.
 
-### Direct connection
+## Test direct connection
 
 In this case, the app connects directly to the server. There is no intermediate proxy involved.
 
@@ -69,7 +69,7 @@ In this case, the app connects directly to the server. There is no intermediate 
 1. Start the server with `npm run docker:server`.
 1. Start the application with `npm run test:app:direct`.
 
-### Connection involving a self-signed certificate
+## Test connection involving a self-signed certificate
 
 For a certificate to be considered valid, it must be signed by a trusted certificate authority (CA), such as *GlobalSign* or *DigiCert*.
 Obtaining such a certificate used to cost some money (this is not true anymore thanks to *[Let's Encrypt](https://letsencrypt.org/)*, a nonprofit certificate authority).
@@ -92,7 +92,7 @@ To be able to use self-signed certificates, an organization must add itself to t
 1. Start the application with `npm run test:app:cert`.
 1. [Optional] You can remove the certificate from your keychain.
 
-### Connection through a proxy
+## Test connection through a proxy
 
 In this case, the app connects to the server through a proxy.
 
@@ -113,7 +113,7 @@ In this case, the app connects to the server through a proxy.
 1. Start the application with `npm run test:app:proxy`.
 1. Turn off the proxy.
 
-### Connection through a proxy with basic auth
+## Test connection through a proxy with basic auth
 
 In this case, the app connects to the server through a proxy that requires a username and a password. Even though the credentials might have been set at the level of the operating system, the user needs to provide them interactively to the Electron application. Note that this is also the case for other apps such as Slack or Docker Desktop.
 
