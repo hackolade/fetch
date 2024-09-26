@@ -106,14 +106,14 @@ In this case, the app connects to the server through a proxy.
 1. Navigate to the details of your network connection.
 1. In the details dialog, select *Proxies*.
 1. Enable *Web proxy (HTTP)* and provide the following settings:
-    - Server: localhost
-    - Port: 3128
+    - Server: *localhost*
+    - Port: *3128*
     - No authentication required
 1. Click on *OK* to apply your changes.
 1. Start the application with `npm run test:app:proxy`.
 1. Turn off the proxy.
 
-## Test connection through a proxy with basic auth
+## Test connection through a proxy that requires basic auth
 
 In this case, the app connects to the server through a proxy that requires a username and a password. Even though the credentials might have been set at the level of the operating system, the user needs to provide them interactively to the Electron application. Note that this is also the case for other apps such as Slack or Docker Desktop.
 
@@ -152,10 +152,26 @@ utilityProcess.fork(..., { respondToAuthRequestsFromMainProcess: true });
 1. Navigate to the details of your network connection.
 1. In the details dialog, select *Proxies*.
 1. Enable *Web proxy (HTTP)* and provide the following settings:
-    - Server: localhost
-    - Port: 3128
-    - Username: user1
-    - Password: user1
+    - Server: *localhost*
+    - Port: *3128*
+    - Username: *user1*
+    - Password: *user1*
 1. Click on *OK* to apply your changes.
 1. Start the application with `npm run test:app:proxy-basic-auth`. Note that you won't be prompted for credentials because we hardcoded them.
+1. Turn off the proxy.
+
+## Test connection through a proxy configured via a PAC file
+
+:warning: **Linux**: PAC files are not natively supported by Linux, aka you cannot set `HTTP_PROXY` or `HTTPS_PROXY` to the URL of a PAC file. Linux requires the application itself to provide support for PAC files. That's because PAC files were originally meant to be used by browsers (see [here](https://en.wikipedia.org/wiki/Proxy_auto-config)). That's why they are JavaScript files.
+
+:white_check_mark: **MacOS**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Open the MacOS *System Settings*.
+1. Select *Network* in the left menu.
+1. Navigate to the details of your network connection.
+1. In the details dialog, select *Proxies*.
+1. Enable *Auto proxy configuration* and provide the following URL: *http://localhost:8081/proxy.pac*.
+1. Click on *OK* to apply your changes.
+1. Start the application with `npm run test:app:proxy-pac-file`. Note that you won't be prompted for credentials because we hardcoded them.
 1. Turn off the proxy.
