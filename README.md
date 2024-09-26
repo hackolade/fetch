@@ -58,6 +58,18 @@ npm run docker:test
 
 :warning: Those tests validate the behavior of the library in Docker/Linux. Validating the library for MacOS and Windows involve manual steps that are documented below.
 
+## Test overview
+
+See next sections for more details...
+
+||Linux|MacOS|Windows|
+|-|-|-|-|
+|Direct connection|:white_check_mark:|:white_check_mark:|:question:|
+|Self-signed certificate|:white_check_mark:|:white_check_mark:|:question:|
+|Proxy|:white_check_mark:|:white_check_mark:|:question:|
+|Proxy with basic auth|:white_check_mark:|:white_check_mark:|:question:|
+|PAC file|:warning|:white_check_mark:|:question:|
+
 ## Test direct connection
 
 In this case, the app connects directly to the server. There is no intermediate proxy involved.
@@ -113,7 +125,7 @@ In this case, the app connects to the server through a proxy.
 1. Start the application with `npm run test:app:proxy`.
 1. Turn off the proxy.
 
-## Test connection through a proxy that requires basic auth
+## Test connection through a proxy that requires basic authentication
 
 In this case, the app connects to the server through a proxy that requires a username and a password. Even though the credentials might have been set at the level of the operating system, the user needs to provide them interactively to the Electron application. Note that this is also the case for other apps such as Slack or Docker Desktop.
 
