@@ -3,6 +3,8 @@ configs:
     file: ./test/resources/proxy/squid.conf
   squid-basic-auth:
     file: ./test/resources/proxy/squid-basic-auth.conf
+  pac-file:
+    file: ./test/resources/proxy/proxy.pac
 
 services:
 
@@ -45,6 +47,26 @@ services:
       - source: squid-basic-auth
         target: /etc/squid/squid.conf
 
+  nginx:
+    image: nginx:stable
+    ports:
+      - 8081:80
+    configs:
+      - source: pac-file
+        target: /usr/share/nginx/html/proxy.pac
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'sh',
+          '-exec',
+          'curl -sSL --fail http://localhost/proxy.pac',
+        ]
+      interval: 2s
+      timeout: 2s
+      retries: 5
+      start_period: 1s
+
   server:
     profiles: [test]
     build:
@@ -53,15 +75,15 @@ services:
       target: hck-fetch-test-server
     init: true
     ports:
-      - 8080:80
-      - 4443:443
+      - 8080:8080
+      - 4443:4443
     healthcheck:
       test:
         [
           'CMD',
           'sh',
           '-exec',
-          'curl -sSL --fail localhost/status',
+          'curl -sSL --fail localhost:8080/status',
         ]
       interval: 2s
       timeout: 2s
@@ -71,6 +93,8 @@ services:
       proxy:
         condition: service_healthy
       proxy-basic-auth:
+        condition: service_healthy
+      nginx:
         condition: service_healthy
 
   app: &app
@@ -116,7 +140,7 @@ services:
     profiles: [test]
     environment:
       - PORT=3003
-      - SERVER_API_URL=http://server/initiators/proxy
+      - SERVER_API_URL=http://server:8080/initiators/proxy
       - HTTP_PROXY=http://localhost:3128
       - HTTPS_PROXY=http://localhost:3128
 
@@ -125,7 +149,7 @@ services:
     profiles: [test]
     environment:
       - PORT=3004
-      - SERVER_API_URL=http://server/initiators/proxy-basic-auth
+      - SERVER_API_URL=http://server:8080/initiators/proxy-basic-auth
       - HTTP_PROXY=http://user1:user1@localhost:3129
       - HTTPS_PROXY=http://user1:user1@localhost:3129
     
