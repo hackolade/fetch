@@ -16,7 +16,6 @@
     "docker:server": "npm run docker:compose -- server",
     "docker:server:verbose": "npm run docker:compose -- --attach-dependencies server",
     "docker:test": "npm run docker:compose -- --exit-code-from=tests --wait-timeout=120",
-    "prettier": "prettier --write --ignore-unknown",
     "test": "node --test ./test/*.spec.js",
     "test:app": "electron ./test/resources/app-electron/main.js",
     "test:app:direct": "PORT=3001 SERVER_API_URL=http://localhost:8080/initiators/direct npm run test:app",
@@ -28,7 +27,7 @@
     "prepare": "husky"
   },
   "lint-staged": {
-    "**/*": "npm run prettier"
+    "**/*": "prettier --write --ignore-unknown"
   },
   "devDependencies": {
     "@swc/cli": "0.4.0",
