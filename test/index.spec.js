@@ -2,7 +2,6 @@ const assert = require('node:assert');
 const { describe, it } = require('node:test');
 
 describe('@hackolade/fetch library', () => {
-
   const SERVER = 'http://0.0.0.0:8080';
 
   async function assertServerReachedFrom(connectionType, initiator) {

@@ -12,13 +12,13 @@ function startServer() {
   log('starting server');
   const app = express();
   const initiators = new Map();
-  
+
   app.get('/initiators/:connectionType/:initiator', (req, res) => {
     const { connectionType, initiator } = req.params;
     const didSendRequest = !!initiators.get(connectionType)?.has(initiator);
     res.status(200).send({ didSendRequest });
   });
-  
+
   app.put('/initiators/:connectionType/:initiator', (req, res) => {
     const { connectionType, initiator } = req.params;
     log('received request from %o', `${connectionType}/${initiator}`);
@@ -48,7 +48,7 @@ function startServer() {
     cert: fs.readFileSync(path.resolve(__dirname, '..', 'certs', 'gen', 'localhost.crt')),
   };
 
- const httpsServer = https.createServer(httpsOptions, app);
+  const httpsServer = https.createServer(httpsOptions, app);
 
   httpsServer.listen(HTTPS_PORT, () => {
     log('server is listening to incoming HTTPS requests');

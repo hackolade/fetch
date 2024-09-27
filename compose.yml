@@ -7,7 +7,6 @@ configs:
     file: ./test/resources/proxy/proxy.pac
 
 services:
-
   proxy: &proxy
     profiles: [test]
     build:
@@ -25,13 +24,7 @@ services:
       - source: squid
         target: /etc/squid/squid.conf
     healthcheck:
-      test:
-        [
-          'CMD',
-          'sh',
-          '-exec',
-          'curl -sSL --fail -x $${HEALTH_CHECK_PROXY_URL} https://hackolade.com',
-        ]
+      test: ['CMD', 'sh', '-exec', 'curl -sSL --fail -x $${HEALTH_CHECK_PROXY_URL} https://hackolade.com']
       interval: 2s
       timeout: 2s
       retries: 5
@@ -55,13 +48,7 @@ services:
       - source: pac-file
         target: /usr/share/nginx/html/proxy.pac
     healthcheck:
-      test:
-        [
-          'CMD',
-          'sh',
-          '-exec',
-          'curl -sSL --fail http://localhost/proxy.pac',
-        ]
+      test: ['CMD', 'sh', '-exec', 'curl -sSL --fail http://localhost/proxy.pac']
       interval: 2s
       timeout: 2s
       retries: 5
@@ -78,13 +65,7 @@ services:
       - 8080:8080
       - 4443:4443
     healthcheck:
-      test:
-        [
-          'CMD',
-          'sh',
-          '-exec',
-          'curl -sSL --fail localhost:8080/status',
-        ]
+      test: ['CMD', 'sh', '-exec', 'curl -sSL --fail localhost:8080/status']
       interval: 2s
       timeout: 2s
       retries: 5
@@ -104,15 +85,9 @@ services:
       dockerfile: Dockerfile
       target: hck-fetch-test-app
     init: true
-    network_mode: host 
+    network_mode: host
     healthcheck:
-      test:
-        [
-          'CMD',
-          'sh',
-          '-exec',
-          'curl -sSL --fail localhost:$${PORT}/status',
-        ]
+      test: ['CMD', 'sh', '-exec', 'curl -sSL --fail localhost:$${PORT}/status']
       interval: 2s
       timeout: 2s
       retries: 5
@@ -152,7 +127,7 @@ services:
       - SERVER_API_URL=http://server:8080/initiators/proxy-basic-auth
       - HTTP_PROXY=http://user1:user1@localhost:3129
       - HTTPS_PROXY=http://user1:user1@localhost:3129
-    
+
   tests:
     profiles: [test]
     build:

@@ -15,18 +15,18 @@ const PROXY_PASSWORD = PROXY_USERNAME;
 
 const PORT = Number.parseInt(process.env.PORT);
 if (!PORT) {
-  throw new Error(`Expected env.PORT to be a positive integer, got '${process.env.PORT}'!`)
+  throw new Error(`Expected env.PORT to be a positive integer, got '${process.env.PORT}'!`);
 }
 
 const SERVER_API_URL = process.env.SERVER_API_URL;
 if (!SERVER_API_URL) {
-  throw new Error(`Expected env.SERVER_API_URL to be defined, got '${process.env.SERVER_API_URL}'!`)
+  throw new Error(`Expected env.SERVER_API_URL to be defined, got '${process.env.SERVER_API_URL}'!`);
 }
 
 log('sending requests to %o', SERVER_API_URL);
 
 function wait(ms) {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     setTimeout(resolve, ms);
   });
 }
@@ -36,7 +36,9 @@ function renderHckFetchResult(window, { process, isSuccess }) {
 }
 
 async function fetchFromUtilityProcess({ renderResult }) {
-  const child = utilityProcess.fork(path.join(__dirname, 'utility.js'), [SERVER_API_URL], { respondToAuthRequestsFromMainProcess: true });
+  const child = utilityProcess.fork(path.join(__dirname, 'utility.js'), [SERVER_API_URL], {
+    respondToAuthRequestsFromMainProcess: true,
+  });
   child.on('message', ({ isSuccess }) => {
     renderResult({ process: 'utility', isSuccess });
   });
@@ -48,7 +50,7 @@ const createWindow = async () => {
     height: 450,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-    }
+    },
   });
   await window.loadFile('index.html', { query: { serverApiUrl: SERVER_API_URL } });
   return window;
@@ -57,7 +59,7 @@ const createWindow = async () => {
 app.whenReady().then(async () => {
   try {
     const window = await createWindow();
-    await fetchFromUtilityProcess({ renderResult: renderHckFetchResult.bind(this, window ) });
+    await fetchFromUtilityProcess({ renderResult: renderHckFetchResult.bind(this, window) });
     try {
       await hckFetch(`${SERVER_API_URL}/main`, { method: 'PUT' });
       renderHckFetchResult(window, { process: 'main', isSuccess: true });
