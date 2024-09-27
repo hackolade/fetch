@@ -79,7 +79,7 @@ In this case, the app connects directly to the server. There is no intermediate 
 :white_check_mark: **MacOS**: follow the instructions below.
 
 1. Start the server with `npm run docker:server`.
-1. Start the application with `npm run test:app:direct`.
+1. Start the application with `npm run test:app:direct`. It should render all connections with a green background.
 
 ## Test connection involving a self-signed certificate
 
