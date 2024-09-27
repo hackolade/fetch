@@ -31,19 +31,39 @@ function wait(ms) {
   });
 }
 
-const createWindow = async () => {
-  const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+function renderHckFetchResult(window, { process, isSuccess }) {
+  window.webContents.send('hck-fetch-result', { process, isSuccess });
+}
+
+async function fetchFromUtilityProcess({ renderResult }) {
+  const child = utilityProcess.fork(path.join(__dirname, 'utility.js'), [SERVER_API_URL], { respondToAuthRequestsFromMainProcess: true });
+  child.on('message', ({ isSuccess }) => {
+    renderResult({ process: 'utility', isSuccess });
   });
-  await win.loadFile('index.html', { query: { serverApiUrl: SERVER_API_URL } });
+}
+
+const createWindow = async () => {
+  const window = new BrowserWindow({
+    width: 700,
+    height: 450,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+    }
+  });
+  await window.loadFile('index.html', { query: { serverApiUrl: SERVER_API_URL } });
+  return window;
 };
 
 app.whenReady().then(async () => {
   try {
-    await createWindow();
-    utilityProcess.fork(path.join(__dirname, 'utility.js'), [SERVER_API_URL], { respondToAuthRequestsFromMainProcess: true });
-    await hckFetch(`${SERVER_API_URL}/main`, { method: 'PUT' });
+    const window = await createWindow();
+    await fetchFromUtilityProcess({ renderResult: renderHckFetchResult.bind(this, window ) });
+    try {
+      await hckFetch(`${SERVER_API_URL}/main`, { method: 'PUT' });
+      renderHckFetchResult(window, { process: 'main', isSuccess: true });
+    } catch (error) {
+      renderHckFetchResult(window, { process: 'main', isSuccess: false });
+    }
   } finally {
     await wait(1000);
     startServer();
