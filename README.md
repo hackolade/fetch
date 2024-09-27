@@ -101,7 +101,7 @@ To be able to use self-signed certificates, an organization must add itself to t
 1. Locate the certificate that you just imported in your keychain (it is named *Hackolade-Test-Root-CA*) and double click on it.
 1. In the *Trust* section of the details dialog, choose to *Always Trust* the certificate for SSL.
 1. Close the details dialog to apply your changes.
-1. Start the application with `npm run test:app:cert`.
+1. Start the application with `npm run test:app:cert`. It should render all connections with a green background.
 1. [Optional] You can remove the certificate from your keychain.
 
 ## Test connection through a proxy
@@ -122,7 +122,7 @@ In this case, the app connects to the server through a proxy.
     - Port: *3128*
     - No authentication required
 1. Click on *OK* to apply your changes.
-1. Start the application with `npm run test:app:proxy`.
+1. Start the application with `npm run test:app:proxy`. It should render all connections with a green background.
 1. Turn off the proxy.
 
 ## Test connection through a proxy that requires basic authentication
@@ -169,7 +169,7 @@ utilityProcess.fork(..., { respondToAuthRequestsFromMainProcess: true });
     - Username: *user1*
     - Password: *user1*
 1. Click on *OK* to apply your changes.
-1. Start the application with `npm run test:app:proxy-basic-auth`. Note that you won't be prompted for credentials because we hardcoded them.
+1. Start the application with `npm run test:app:proxy-basic-auth`. It should render all connections with a green background. Note that you won't be prompted for credentials because we hardcoded them.
 1. Turn off the proxy.
 
 ## Test connection through a proxy configured via a PAC file
@@ -185,5 +185,5 @@ utilityProcess.fork(..., { respondToAuthRequestsFromMainProcess: true });
 1. In the details dialog, select *Proxies*.
 1. Enable *Auto proxy configuration* and provide the following URL: *http://localhost:8081/proxy.pac*.
 1. Click on *OK* to apply your changes.
-1. Start the application with `npm run test:app:proxy-pac-file`. Note that you won't be prompted for credentials because we hardcoded them.
+1. Start the application with `npm run test:app:proxy-pac-file`. It should render all connections with a green background.
 1. Turn off the proxy.

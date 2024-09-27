@@ -50,7 +50,7 @@ EOF
 
 # Start test application
 FROM hck-fetch-runtime AS hck-fetch-test-app
-CMD [ "/src/hck/node_modules/electron/dist/electron", "--no-sandbox", "/src/hck/test/resources/electron-app/main.js" ]
+CMD [ "/src/hck/node_modules/electron/dist/electron", "--no-sandbox", "/src/hck/test/resources/app-electron/main.js" ]
 
 # Install root CA in order to accept self-signed certificates
 # See https://chromium.googlesource.com/chromium/src/+/master/docs/linux/cert_management.md
