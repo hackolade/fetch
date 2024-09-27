@@ -1,22 +1,22 @@
 .hck-fetch-result {
-  color: #333;
-  background-color: #CCC;
-  border-radius: 15px;
-  width: 90%;
-  height: 75px;
-  line-height: 75px;
-  margin-right: auto;
-  margin-bottom: 20px;
-  margin-left: auto;
-  text-align: center;
+	color: #333;
+	background-color: #ccc;
+	border-radius: 15px;
+	width: 90%;
+	height: 75px;
+	line-height: 75px;
+	margin-right: auto;
+	margin-bottom: 20px;
+	margin-left: auto;
+	text-align: center;
 }
 
 .hck-fetch-result-ok {
-  color: #FFF;
-  background-color: #00CC00;
+	color: #fff;
+	background-color: #00cc00;
 }
 
 .hck-fetch-result-nok {
-  color: #FFF;
-  background-color: #CC0000;
+	color: #fff;
+	background-color: #cc0000;
 }

@@ -1,173 +1,148 @@
 configs:
-  squid:
-    file: ./test/resources/proxy/squid.conf
-  squid-basic-auth:
-    file: ./test/resources/proxy/squid-basic-auth.conf
-  pac-file:
-    file: ./test/resources/proxy/proxy.pac
+    squid:
+        file: ./test/resources/proxy/squid.conf
+    squid-basic-auth:
+        file: ./test/resources/proxy/squid-basic-auth.conf
+    pac-file:
+        file: ./test/resources/proxy/proxy.pac
 
 services:
+    proxy: &proxy
+        profiles: [test]
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: hck-fetch-test-proxy
+        init: true
+        entrypoint: /apps/squid/sbin/squid
+        command: -N -f /etc/squid/squid.conf
+        ports:
+            - 3128:3128
+        environment:
+            - HEALTH_CHECK_PROXY_URL=localhost:3128
+        configs:
+            - source: squid
+              target: /etc/squid/squid.conf
+        healthcheck:
+            test: ['CMD', 'sh', '-exec', 'curl -sSL --fail -x $${HEALTH_CHECK_PROXY_URL} https://hackolade.com']
+            interval: 2s
+            timeout: 2s
+            retries: 5
+            start_period: 1s
 
-  proxy: &proxy
-    profiles: [test]
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: hck-fetch-test-proxy
-    init: true
-    entrypoint: /apps/squid/sbin/squid
-    command: -N -f /etc/squid/squid.conf
-    ports:
-      - 3128:3128
-    environment:
-      - HEALTH_CHECK_PROXY_URL=localhost:3128
-    configs:
-      - source: squid
-        target: /etc/squid/squid.conf
-    healthcheck:
-      test:
-        [
-          'CMD',
-          'sh',
-          '-exec',
-          'curl -sSL --fail -x $${HEALTH_CHECK_PROXY_URL} https://hackolade.com',
-        ]
-      interval: 2s
-      timeout: 2s
-      retries: 5
-      start_period: 1s
+    proxy-basic-auth:
+        <<: *proxy
+        ports:
+            - 3129:3128
+        environment:
+            - HEALTH_CHECK_PROXY_URL=http://user1:user1@localhost:3128
+        configs:
+            - source: squid-basic-auth
+              target: /etc/squid/squid.conf
 
-  proxy-basic-auth:
-    <<: *proxy
-    ports:
-      - 3129:3128
-    environment:
-      - HEALTH_CHECK_PROXY_URL=http://user1:user1@localhost:3128
-    configs:
-      - source: squid-basic-auth
-        target: /etc/squid/squid.conf
+    nginx:
+        image: nginx:stable
+        ports:
+            - 8081:80
+        configs:
+            - source: pac-file
+              target: /usr/share/nginx/html/proxy.pac
+        healthcheck:
+            test: ['CMD', 'sh', '-exec', 'curl -sSL --fail http://localhost/proxy.pac']
+            interval: 2s
+            timeout: 2s
+            retries: 5
+            start_period: 1s
 
-  nginx:
-    image: nginx:stable
-    ports:
-      - 8081:80
-    configs:
-      - source: pac-file
-        target: /usr/share/nginx/html/proxy.pac
-    healthcheck:
-      test:
-        [
-          'CMD',
-          'sh',
-          '-exec',
-          'curl -sSL --fail http://localhost/proxy.pac',
-        ]
-      interval: 2s
-      timeout: 2s
-      retries: 5
-      start_period: 1s
+    server:
+        profiles: [test]
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: hck-fetch-test-server
+        init: true
+        ports:
+            - 8080:8080
+            - 4443:4443
+        healthcheck:
+            test: ['CMD', 'sh', '-exec', 'curl -sSL --fail localhost:8080/status']
+            interval: 2s
+            timeout: 2s
+            retries: 5
+            start_period: 1s
+        depends_on:
+            proxy:
+                condition: service_healthy
+            proxy-basic-auth:
+                condition: service_healthy
+            nginx:
+                condition: service_healthy
 
-  server:
-    profiles: [test]
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: hck-fetch-test-server
-    init: true
-    ports:
-      - 8080:8080
-      - 4443:4443
-    healthcheck:
-      test:
-        [
-          'CMD',
-          'sh',
-          '-exec',
-          'curl -sSL --fail localhost:8080/status',
-        ]
-      interval: 2s
-      timeout: 2s
-      retries: 5
-      start_period: 1s
-    depends_on:
-      proxy:
-        condition: service_healthy
-      proxy-basic-auth:
-        condition: service_healthy
-      nginx:
-        condition: service_healthy
+    app: &app
+        profiles: [template]
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: hck-fetch-test-app
+        init: true
+        network_mode: host
+        healthcheck:
+            test: ['CMD', 'sh', '-exec', 'curl -sSL --fail localhost:$${PORT}/status']
+            interval: 2s
+            timeout: 2s
+            retries: 5
+            start_period: 1s
+        depends_on:
+            server:
+                condition: service_healthy
 
-  app: &app
-    profiles: [template]
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: hck-fetch-test-app
-    init: true
-    network_mode: host 
-    healthcheck:
-      test:
-        [
-          'CMD',
-          'sh',
-          '-exec',
-          'curl -sSL --fail localhost:$${PORT}/status',
-        ]
-      interval: 2s
-      timeout: 2s
-      retries: 5
-      start_period: 1s
-    depends_on:
-      server:
-        condition: service_healthy
+    app-direct:
+        <<: *app
+        profiles: [test]
+        environment:
+            - PORT=3001
+            - SERVER_API_URL=http://localhost:8080/initiators/direct
 
-  app-direct:
-    <<: *app
-    profiles: [test]
-    environment:
-      - PORT=3001
-      - SERVER_API_URL=http://localhost:8080/initiators/direct
+    app-self-signed-cert:
+        <<: *app
+        profiles: [test]
+        environment:
+            - PORT=3002
+            - SERVER_API_URL=https://localhost:4443/initiators/cert
 
-  app-self-signed-cert:
-    <<: *app
-    profiles: [test]
-    environment:
-      - PORT=3002
-      - SERVER_API_URL=https://localhost:4443/initiators/cert
+    app-proxy:
+        <<: *app
+        profiles: [test]
+        environment:
+            - PORT=3003
+            - SERVER_API_URL=http://server:8080/initiators/proxy
+            - HTTP_PROXY=http://localhost:3128
+            - HTTPS_PROXY=http://localhost:3128
 
-  app-proxy:
-    <<: *app
-    profiles: [test]
-    environment:
-      - PORT=3003
-      - SERVER_API_URL=http://server:8080/initiators/proxy
-      - HTTP_PROXY=http://localhost:3128
-      - HTTPS_PROXY=http://localhost:3128
+    app-proxy-basic-auth:
+        <<: *app
+        profiles: [test]
+        environment:
+            - PORT=3004
+            - SERVER_API_URL=http://server:8080/initiators/proxy-basic-auth
+            - HTTP_PROXY=http://user1:user1@localhost:3129
+            - HTTPS_PROXY=http://user1:user1@localhost:3129
 
-  app-proxy-basic-auth:
-    <<: *app
-    profiles: [test]
-    environment:
-      - PORT=3004
-      - SERVER_API_URL=http://server:8080/initiators/proxy-basic-auth
-      - HTTP_PROXY=http://user1:user1@localhost:3129
-      - HTTPS_PROXY=http://user1:user1@localhost:3129
-    
-  tests:
-    profiles: [test]
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: hck-fetch-tests
-    init: true
-    network_mode: host
-    tty: true
-    depends_on:
-      app-direct:
-        condition: service_healthy
-      app-self-signed-cert:
-        condition: service_healthy
-      app-proxy:
-        condition: service_healthy
-      app-proxy-basic-auth:
-        condition: service_healthy
+    tests:
+        profiles: [test]
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: hck-fetch-tests
+        init: true
+        network_mode: host
+        tty: true
+        depends_on:
+            app-direct:
+                condition: service_healthy
+            app-self-signed-cert:
+                condition: service_healthy
+            app-proxy:
+                condition: service_healthy
+            app-proxy-basic-auth:
+                condition: service_healthy

@@ -1,3 +1,3 @@
 function FindProxyForURL() {
-  return 'PROXY localhost:3128';
-};
+	return 'PROXY localhost:3128';
+}
