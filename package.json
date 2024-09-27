@@ -16,6 +16,7 @@
     "docker:server": "npm run docker:compose -- server",
     "docker:server:verbose": "npm run docker:compose -- --attach-dependencies server",
     "docker:test": "npm run docker:compose -- --exit-code-from=tests --wait-timeout=120",
+    "prettier": "prettier --write --ignore-unknown",
     "test": "node --test ./test/*.spec.js",
     "test:app": "electron ./test/resources/app-electron/main.js",
     "test:app:direct": "PORT=3001 SERVER_API_URL=http://localhost:8080/initiators/direct npm run test:app",
@@ -23,7 +24,11 @@
     "test:app:proxy": "PORT=3003 SERVER_API_URL=http://server:8080/initiators/proxy npm run test:app",
     "test:app:proxy-basic-auth": "PORT=3004 SERVER_API_URL=http://server:8080/initiators/proxy-basic-auth npm run test:app",
     "test:app:proxy-pac-file": "PORT=3005 SERVER_API_URL=http://server:8080/initiators/proxy-pac-file npm run test:app",
-    "test:server": "DEBUG=hck-fetch* node ./test/resources/server/server.js"
+    "test:server": "DEBUG=hck-fetch* node ./test/resources/server/server.js",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "**/*": "npm run prettier"
   },
   "devDependencies": {
     "@swc/cli": "0.4.0",
@@ -31,6 +36,8 @@
     "debug": "4.3.7",
     "electron": "32.1.0",
     "express": "4.21.0",
+    "husky": "9.1.6",
+    "lint-staged": "15.2.10",
     "prettier": "3.3.3"
   }
 }
