@@ -50,13 +50,13 @@ Follow the instructions below prior to executing the tests:
 
 ## Test automation
 
-If your OS is **Linux or MacOS**, then you can run the command below to execute the automated tests.
+You can run the command below to execute the automated tests.
 
 ```sh
 npm run docker:test
 ```
 
-:warning: Those tests validate the behavior of the library in Docker/Linux. Validating the library for MacOS and Windows involve manual steps that are documented below.
+:warning: Those tests validate the behavior of the library in Docker/Linux. Validating the behavior of the library in MacOS and Windows involve manual steps that are documented below.
 
 ## Test overview
 
