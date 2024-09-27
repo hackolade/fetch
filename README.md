@@ -65,10 +65,10 @@ See next sections for more details...
 ||Linux|MacOS|Windows|
 |-|-|-|-|
 |Direct connection|:white_check_mark:|:white_check_mark:|:question:|
-|Self-signed certificate|:white_check_mark:|:white_check_mark:|:question:|
-|Proxy|:white_check_mark:|:white_check_mark:|:question:|
-|Proxy with basic auth|:white_check_mark:|:white_check_mark:|:question:|
-|PAC file|:warning:|:white_check_mark:|:question:|
+|Self-signed certificate (OS integration)|:white_check_mark:|:white_check_mark:|:question:|
+|Proxy (OS integration)|:white_check_mark:|:white_check_mark:|:question:|
+|Proxy with basic auth (OS integration)|:white_check_mark:|:white_check_mark:|:question:|
+|PAC file (OS integration)|:warning:|:white_check_mark:|:question:|
 
 ## Test direct connection
 
