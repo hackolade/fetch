@@ -69,7 +69,7 @@ See next sections for more details...
 |Direct connection|:white_check_mark:|:white_check_mark:|:white_check_mark:|
 |Self-signed certificate (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:|
 |Proxy (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:|
-|Proxy with basic auth (OS integration)|:white_check_mark:|:white_check_mark:|:question:|
+|Proxy with basic auth (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:|
 |PAC file (OS integration)|:warning:|:white_check_mark:|:question:|
 
 ## Test direct connection
@@ -151,7 +151,7 @@ In this case, the app connects to the server through a proxy.
 1. Select *Network & Internet* in the left menu.
 1. Navigate to the *Proxy* section.
 1. Configure a proxy manually with the following settings:
-    - Server: *127.0.0.1* (using *localhost* does NOT work)
+    - Server: *127.0.0.1*
     - Port: *3128*
 1. Click on *Save* to apply your changes.
 1. Start the application with `npm run test:app:proxy`. It should render all connections with a green background.
@@ -197,12 +197,32 @@ utilityProcess.fork(..., { respondToAuthRequestsFromMainProcess: true });
 1. In the details dialog, select *Proxies*.
 1. Enable *Web proxy (HTTP)* and provide the following settings:
     - Server: *localhost*
-    - Port: *3128*
+    - Port: *3129*
     - Username: *user1*
     - Password: *user1*
 1. Click on *OK* to apply your changes.
 1. Start the application with `npm run test:app:proxy-basic-auth`. It should render all connections with a green background. Note that you won't be prompted for credentials because we hardcoded them.
 1. Turn off the proxy.
+
+:white_check_mark: **Windows**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Open the *Settings* app by pressing *Windows+I*.
+1. Select *Network & Internet* in the left menu.
+1. Navigate to the *Proxy* section.
+1. Configure a proxy manually with the following settings:
+    - Server: *127.0.0.1*
+    - Port: *3129*
+1. Click on *Save* to apply your changes.
+1. Open the Windows *Start* menu and search for *Credential Manager* (*Gestionnaire d'identification* in French).
+1. In the credential manager, click on *Windows Credentials* (*Information d'identification Windows* in French).
+1. Click on *Add a Windows credential* (*Ajouter des informations d'identification Windows*) and provide the following settings:
+    - Network address: *127.0.0.1:3129*
+    - User name: *user1*
+    - Password: *user1*
+1. Click on *OK* to apply your changes.
+1. Start the application with `npm run test:app:proxy-basic-auth`. It should render all connections with a green background. Note that you won't be prompted for credentials because we hardcoded them.
+1. Turn off the proxy. Delete the Windows credential that you created.
 
 ## Test connection through a proxy configured via a PAC file
 
