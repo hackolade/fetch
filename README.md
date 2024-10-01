@@ -48,7 +48,7 @@ Follow the instructions below prior to executing the tests:
 - Install the latest version of `node`: see instructions [here](https://nodejs.org/en/learn/getting-started/how-to-install-nodejs).
 - Install `docker` for your operating system: see instructions [here](https://docs.docker.com/engine/install/).
 - Run `npm install` in this repository in order to install the dependencies.
-- Connect to our internal Docker registry: see instructions [here]().
+- Connect to our internal Docker registry: see instructions [here](https://app.gitbook.com/o/HBtg1gLTy0nw4NaX0MaV/s/bfdwYZ4RTsNHasAMVAKe/faq/connect-to-azure-docker-registry).
 
 ## Test automation
 
