@@ -45,8 +45,10 @@ In order to perform those tests, we have prepared multiple components:
 
 Follow the instructions below prior to executing the tests:
 
-- Install both `node/npm` and `docker`.
-- Run `npm install` in this repository.
+- Install the latest version of `node`: see instructions [here](https://nodejs.org/en/learn/getting-started/how-to-install-nodejs).
+- Install `docker` for your operating system: see instructions [here](https://docs.docker.com/engine/install/).
+- Run `npm install` in this repository in order to install the dependencies.
+- Connect to our internal Docker registry: see instructions [here]().
 
 ## Test automation
 
@@ -77,6 +79,11 @@ In this case, the app connects directly to the server. There is no intermediate 
 :white_check_mark: **Linux**: this case is covered by the automated tests.
 
 :white_check_mark: **MacOS**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Start the application with `npm run test:app:direct`. It should render all connections with a green background.
+
+:white_check_mark: **Windows**: follow the instructions below.
 
 1. Start the server with `npm run docker:server`.
 1. Start the application with `npm run test:app:direct`. It should render all connections with a green background.
