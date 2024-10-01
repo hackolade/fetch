@@ -46,7 +46,7 @@ In order to perform those tests, we have prepared multiple components:
 Follow the instructions below prior to executing the tests:
 
 - Install the latest version of `node`: see instructions [here](https://nodejs.org/en/learn/getting-started/how-to-install-nodejs).
-- Install `docker` for your operating system: see instructions [here](https://docs.docker.com/engine/install/).
+- Install **and start** the `docker` engine for your operating system: see instructions [here](https://docs.docker.com/engine/install/).
 - Run `npm install` in this repository in order to install the dependencies.
 - Connect to our internal Docker registry: see instructions [here](https://app.gitbook.com/o/HBtg1gLTy0nw4NaX0MaV/s/bfdwYZ4RTsNHasAMVAKe/faq/connect-to-azure-docker-registry).
 
@@ -70,7 +70,7 @@ See next sections for more details...
 |Self-signed certificate (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:|
 |Proxy (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:|
 |Proxy with basic auth (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:|
-|PAC file (OS integration)|:warning:|:white_check_mark:|:question:|
+|PAC file (OS integration)|:warning:|:white_check_mark:|:white_check_mark:|
 
 ## Test direct connection
 
@@ -237,5 +237,16 @@ utilityProcess.fork(..., { respondToAuthRequestsFromMainProcess: true });
 1. In the details dialog, select *Proxies*.
 1. Enable *Auto proxy configuration* and provide the following URL: *http://localhost:8081/proxy.pac*.
 1. Click on *OK* to apply your changes.
+1. Start the application with `npm run test:app:proxy-pac-file`. It should render all connections with a green background.
+1. Turn off the proxy.
+
+:white_check_mark: **Windows**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Open the *Settings* app by pressing *Windows+I*.
+1. Select *Network & Internet* in the left menu.
+1. Navigate to the *Proxy* section.
+1. Choose to use an installation script and provide the following URL: *http://127.0.0.1:8081/proxy.pac*.
+1. Click on *Save* to apply your changes.
 1. Start the application with `npm run test:app:proxy-pac-file`. It should render all connections with a green background.
 1. Turn off the proxy.
