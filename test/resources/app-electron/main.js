@@ -65,6 +65,7 @@ app.whenReady().then(async () => {
       renderHckFetchResult(window, { process: 'main', isSuccess: true });
     } catch (error) {
       renderHckFetchResult(window, { process: 'main', isSuccess: false });
+      console.log('Could not fetch from main process!', error);
     }
   } finally {
     await wait(1000);
