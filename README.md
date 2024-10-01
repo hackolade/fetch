@@ -88,6 +88,8 @@ In this case, the app connects directly to the server. There is no intermediate 
 1. Start the server with `npm run docker:server`.
 1. Start the application with `npm run test:app:direct`. It should render all connections with a green background.
 
+**WARNING:** with Docker Desktop for Windows, connections to `localhost` seem to hang from time to time. Restarting the computer fixes the problem.
+
 ## Test connection involving a self-signed certificate
 
 For a certificate to be considered valid, it must be signed by a trusted certificate authority (CA), such as *GlobalSign* or *DigiCert*.
