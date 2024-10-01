@@ -32,11 +32,11 @@ In order to perform those tests, we have prepared multiple components:
 
 |Component|URL|Description|
 |-|-|-|
-|`server`|On your host (direct access): <br> http://localhost:8080 <br> https://localhost:4443 <br><br> In Docker network (access through proxy): http://server:8080 <br> https://server:4443|This server exposes the following REST endpoint: <br> `PUT /initiators/:connectionType/:initiator` <br> It allows clients to register themselves using arbitrary routes: <br> `/initiators/direct/main`, `initiators/proxy/renderer`, etc. <br><br> This server also exposes the following REST endpoint: <br> `GET /initiators/:connectionType/:initiator` <br> It can be used to check if a given client managed to reach the server to register itself.|
+|`server`|On your host (direct access): <br> http://127.0.0.1:8080 <br> https://127.0.0.1:4443 <br><br> In Docker network (access through proxy): http://server:8080 <br> https://server:4443|This server exposes the following REST endpoint: <br> `PUT /initiators/:connectionType/:initiator` <br> It allows clients to register themselves using arbitrary routes: <br> `/initiators/direct/main`, `initiators/proxy/renderer`, etc. <br><br> This server also exposes the following REST endpoint: <br> `GET /initiators/:connectionType/:initiator` <br> It can be used to check if a given client managed to reach the server to register itself.|
 |`app`|NA|This is an Electron application. It contacts the server from both the *main* process, a *renderer* process and a *utility* process. Each process registers itself as a distinct `:initiator`: `main`, `renderer` and `utility` respectively. The base URL of the endpoint - including the `:connectionType` - is passed to the application through an environment variable, making it possible to start different instances of the application to cover different cases (e.g. direct connection, connection through a proxy).|
-|`proxy`|http://localhost:3128|This is a proxy that does not require authentication.|
-|`proxy-basic-auth`|http://localhost:3129|This is a proxy that requires basic authentication. You can use `user1` as both username and password.|
-|PAC file|http://localhost:8081/proxy.pac|This is a PAC file that leads to using the proxy that does not require authentication.|
+|`proxy`|http://127.0.0.1:3128|This is a proxy that does not require authentication.|
+|`proxy-basic-auth`|http://127.0.0.1:3129|This is a proxy that requires basic authentication. You can use `user1` as both username and password.|
+|PAC file|http://127.0.0.1:8081/proxy.pac|This is a PAC file that leads to using the proxy that does not require authentication.|
 |`tests`|NA|This is a set of tests that query the REST API of the server to verify that all clients could successfully register themselves, whatever the context of the connection.|
 
 ![diagram](./doc/test-components.drawio.svg)
@@ -105,8 +105,8 @@ To be able to use self-signed certificates, an organization must add itself to t
 1. Open the MacOS *Keychain Access*.
 1. Click on *File* > *Import Items*.
 1. Select the certificate [./test/resources/certs/gen/rootCA.crt](./test/resources/certs/gen/rootCA.crt).
-1. Locate the certificate that you just imported in your keychain (it is named *Hackolade-Test-Root-CA*) and double click on it.
-1. In the *Trust* section of the details dialog, choose to *Always Trust* the certificate for SSL.
+1. Locate the certificate that you just imported in your keychain (search for *Hackolade-Test-Root-CA*) and double click on it.
+1. Expand the *Trust* section of the details dialog and choose to *Always Trust* the certificate for SSL.
 1. Close the details dialog to apply your changes.
 1. Start the application with `npm run test:app:cert`. It should render all connections with a green background.
 1. [Optional] You can remove the certificate from your keychain.
@@ -135,7 +135,7 @@ In this case, the app connects to the server through a proxy.
 1. Navigate to the details of your network connection.
 1. In the details dialog, select *Proxies*.
 1. Enable *Web proxy (HTTP)* and provide the following settings:
-    - Server: *localhost*
+    - Server: *127.0.0.1*
     - Port: *3128*
     - No authentication required
 1. Click on *OK* to apply your changes.
@@ -194,7 +194,7 @@ utilityProcess.fork(..., { respondToAuthRequestsFromMainProcess: true });
 1. Navigate to the details of your network connection.
 1. In the details dialog, select *Proxies*.
 1. Enable *Web proxy (HTTP)* and provide the following settings:
-    - Server: *localhost*
+    - Server: *127.0.0.1*
     - Port: *3129*
     - Username: *user1*
     - Password: *user1*
@@ -233,7 +233,7 @@ utilityProcess.fork(..., { respondToAuthRequestsFromMainProcess: true });
 1. Select *Network* in the left menu.
 1. Navigate to the details of your network connection.
 1. In the details dialog, select *Proxies*.
-1. Enable *Auto proxy configuration* and provide the following URL: *http://localhost:8081/proxy.pac*.
+1. Enable *Auto proxy configuration* and provide the following URL: *http://127.0.0.1:8081/proxy.pac*.
 1. Click on *OK* to apply your changes.
 1. Start the application with `npm run test:app:proxy-pac-file`. It should render all connections with a green background.
 1. Turn off the proxy.
