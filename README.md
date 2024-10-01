@@ -66,8 +66,8 @@ See next sections for more details...
 
 ||Linux|MacOS|Windows|
 |-|-|-|-|
-|Direct connection|:white_check_mark:|:white_check_mark:|:question:|
-|Self-signed certificate (OS integration)|:white_check_mark:|:white_check_mark:|:question:|
+|Direct connection|:white_check_mark:|:white_check_mark:|:white_check_mark:|
+|Self-signed certificate (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:|
 |Proxy (OS integration)|:white_check_mark:|:white_check_mark:|:question:|
 |Proxy with basic auth (OS integration)|:white_check_mark:|:white_check_mark:|:question:|
 |PAC file (OS integration)|:warning:|:white_check_mark:|:question:|
@@ -110,6 +110,16 @@ To be able to use self-signed certificates, an organization must add itself to t
 1. Close the details dialog to apply your changes.
 1. Start the application with `npm run test:app:cert`. It should render all connections with a green background.
 1. [Optional] You can remove the certificate from your keychain.
+
+:white_check_mark: **Windows**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Using the file explorer, double click on the certificate [./test/resources/certs/gen/rootCA.crt](./test/resources/certs/gen/rootCA.crt).
+1. Click on *Install certificate* in the details dialog.
+1. Click on *Next* until you have the option to select a store. Browser the available stores and select *Trusted Root Certification Authorities*.
+1. Click on *Next* until you complete the installation process.
+1. Start the application with `npm run test:app:cert`. It should render all connections with a green background.
+1. [Optional] You can remove the certificate using the *Windows Certificate Manager* (search for `certmgr.msc` in the *Start* menu).
 
 ## Test connection through a proxy
 
