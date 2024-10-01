@@ -68,7 +68,7 @@ See next sections for more details...
 |-|-|-|-|
 |Direct connection|:white_check_mark:|:white_check_mark:|:white_check_mark:|
 |Self-signed certificate (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:|
-|Proxy (OS integration)|:white_check_mark:|:white_check_mark:|:question:|
+|Proxy (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:|
 |Proxy with basic auth (OS integration)|:white_check_mark:|:white_check_mark:|:question:|
 |PAC file (OS integration)|:warning:|:white_check_mark:|:question:|
 
@@ -139,6 +139,19 @@ In this case, the app connects to the server through a proxy.
     - Port: *3128*
     - No authentication required
 1. Click on *OK* to apply your changes.
+1. Start the application with `npm run test:app:proxy`. It should render all connections with a green background.
+1. Turn off the proxy.
+
+:white_check_mark: **Windows**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Open the *Settings* app by pressing *Windows+I*.
+1. Select *Network & Internet* in the left menu.
+1. Navigate to the *Proxy* section.
+1. Configure a proxy manually with the following settings:
+    - Server: *127.0.0.1* (using *localhost* does NOT work)
+    - Port: *3128*
+1. Click on *Save* to apply your changes.
 1. Start the application with `npm run test:app:proxy`. It should render all connections with a green background.
 1. Turn off the proxy.
 
