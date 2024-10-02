@@ -64,13 +64,13 @@ npm run docker:test
 
 See next sections for more details...
 
-||Linux|MacOS|Windows|
-|-|-|-|-|
-|Direct connection|:white_check_mark:|:white_check_mark:|:white_check_mark:|
-|Self-signed certificate (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:|
-|Proxy (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:|
-|Proxy with basic auth (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:|
-|PAC file (OS integration)|:warning:|:white_check_mark:|:white_check_mark:|
+||Linux|MacOS|Windows|Notes|
+|-|-|-|-|-|
+|Direct connection|:white_check_mark:|:white_check_mark:|:white_check_mark:||
+|Self-signed certificate (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:||
+|Proxy (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:||
+|Proxy with basic auth (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:|Requires Electron 32+|
+|PAC file (OS integration)|:warning:|:white_check_mark:|:white_check_mark:|Not natively supported by the Linux OS|
 
 ## Test direct connection
 
