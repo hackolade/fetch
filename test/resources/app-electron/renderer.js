@@ -1,5 +1,6 @@
 (async function () {
   const { hckFetch } = await import('../../../dist/esm/index.mjs');
+  const { onHckFetchResult, sendHckFetchResult } = window.electronAPI;
 
   function renderHckFetchResult({ process, isSuccess }) {
     const resultClass = isSuccess ? 'hck-fetch-result-ok' : 'hck-fetch-result-nok';
@@ -7,9 +8,7 @@
   }
 
   // Listen for result of fetch() from other processes
-  window.electronAPI.onHckFetchResult((_, { process, isSuccess }) => {
-    renderHckFetchResult({ process, isSuccess });
-  });
+  onHckFetchResult((_, { process, isSuccess }) => renderHckFetchResult({ process, isSuccess }));
 
   // Try to fetch() from renderer process
   const params = new URL(document.location).searchParams;
@@ -17,8 +16,12 @@
   document.getElementById('title').textContent = `ENDPOINT: ${serverApiUrl}`;
   try {
     await hckFetch(`${serverApiUrl}/renderer`, { method: 'PUT' });
-    renderHckFetchResult({ process: 'renderer', isSuccess: true });
+    const result = { process: 'renderer', isSuccess: true };
+    renderHckFetchResult(result);
+    sendHckFetchResult(result);
   } catch (error) {
-    renderHckFetchResult({ process: 'renderer', isSuccess: false });
+    const result = { process: 'renderer', isSuccess: false, error };
+    renderHckFetchResult(result);
+    sendHckFetchResult(result);
   }
 })();

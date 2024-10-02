@@ -1,5 +1,5 @@
 const debug = require('debug');
-const { app, BrowserWindow, utilityProcess } = require('electron');
+const { app, BrowserWindow, ipcMain, utilityProcess } = require('electron');
 const express = require('express');
 const path = require('path');
 const { hckFetch } = require('../../../dist/cjs/index.cjs');
@@ -31,16 +31,23 @@ function wait(ms) {
   });
 }
 
+function logHckFetchResult({ process, isSuccess, error }) {
+  if (!isSuccess) {
+    console.log(`ERROR: Could not fetch from ${process} process!`, error);
+  }
+}
+
 function renderHckFetchResult(window, { process, isSuccess }) {
   window.webContents.send('hck-fetch-result', { process, isSuccess });
 }
 
-async function fetchFromUtilityProcess({ renderResult }) {
+async function fetchFromUtilityProcess({ logResult, renderResult }) {
   const child = utilityProcess.fork(path.join(__dirname, 'utility.js'), [SERVER_API_URL], {
     respondToAuthRequestsFromMainProcess: true,
   });
-  child.on('message', ({ isSuccess }) => {
-    renderResult({ process: 'utility', isSuccess });
+  child.on('message', result => {
+    logResult(result);
+    renderResult(result);
   });
 }
 
@@ -59,18 +66,25 @@ const createWindow = async () => {
 app.whenReady().then(async () => {
   try {
     const window = await createWindow();
-    await fetchFromUtilityProcess({ renderResult: renderHckFetchResult.bind(this, window) });
+    await fetchFromUtilityProcess({
+      logResult: logHckFetchResult.bind(this),
+      renderResult: renderHckFetchResult.bind(this, window),
+    });
     try {
       await hckFetch(`${SERVER_API_URL}/main`, { method: 'PUT' });
       renderHckFetchResult(window, { process: 'main', isSuccess: true });
     } catch (error) {
       renderHckFetchResult(window, { process: 'main', isSuccess: false });
-      console.log('Could not fetch from main process!', error);
+      console.log('ERROR: Could not fetch from main process!', error);
     }
   } finally {
     await wait(1000);
     startServer();
   }
+});
+
+ipcMain.on('hck-fetch-result', (_, result) => {
+  logHckFetchResult(result);
 });
 
 app.on('login', (event, webContents, details, authInfo, callback) => {
