@@ -3,8 +3,10 @@
   const serverApiUrl = process.argv[2];
   try {
     await hckFetch(`${serverApiUrl}/utility`, { method: 'PUT' });
-    process.parentPort.postMessage({ isSuccess: true });
+    const result = { process: 'utility', isSuccess: true };
+    process.parentPort.postMessage(result);
   } catch (error) {
-    process.parentPort.postMessage({ isSuccess: false });
+    const result = { process: 'utility', isSuccess: false, error };
+    process.parentPort.postMessage(result);
   }
 })();

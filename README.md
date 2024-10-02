@@ -32,11 +32,11 @@ In order to perform those tests, we have prepared multiple components:
 
 |Component|URL|Description|
 |-|-|-|
-|`server`|On your host (direct access): <br> http://localhost:8080 <br> https://localhost:4443 <br><br> In Docker network (access through proxy): http://server:8080 <br> https://server:4443|This server exposes the following REST endpoint: <br> `PUT /initiators/:connectionType/:initiator` <br> It allows clients to register themselves using arbitrary routes: <br> `/initiators/direct/main`, `initiators/proxy/renderer`, etc. <br><br> This server also exposes the following REST endpoint: <br> `GET /initiators/:connectionType/:initiator` <br> It can be used to check if a given client managed to reach the server to register itself.|
+|`server`|On your host (direct access): <br> http://127.0.0.1:8080 <br> https://127.0.0.1:4443 <br><br> In Docker network (access through proxy): http://server:8080 <br> https://server:4443|This server exposes the following REST endpoint: <br> `PUT /initiators/:connectionType/:initiator` <br> It allows clients to register themselves using arbitrary routes: <br> `/initiators/direct/main`, `initiators/proxy/renderer`, etc. <br><br> This server also exposes the following REST endpoint: <br> `GET /initiators/:connectionType/:initiator` <br> It can be used to check if a given client managed to reach the server to register itself.|
 |`app`|NA|This is an Electron application. It contacts the server from both the *main* process, a *renderer* process and a *utility* process. Each process registers itself as a distinct `:initiator`: `main`, `renderer` and `utility` respectively. The base URL of the endpoint - including the `:connectionType` - is passed to the application through an environment variable, making it possible to start different instances of the application to cover different cases (e.g. direct connection, connection through a proxy).|
-|`proxy`|http://localhost:3128|This is a proxy that does not require authentication.|
-|`proxy-basic-auth`|http://localhost:3129|This is a proxy that requires basic authentication. You can use `user1` as both username and password.|
-|PAC file|http://localhost:8081/proxy.pac|This is a PAC file that leads to using the proxy that does not require authentication.|
+|`proxy`|http://127.0.0.1:3128|This is a proxy that does not require authentication.|
+|`proxy-basic-auth`|http://127.0.0.1:3129|This is a proxy that requires basic authentication. You can use `user1` as both username and password.|
+|PAC file|http://127.0.0.1:8081/proxy.pac|This is a PAC file that leads to using the proxy that does not require authentication.|
 |`tests`|NA|This is a set of tests that query the REST API of the server to verify that all clients could successfully register themselves, whatever the context of the connection.|
 
 ![diagram](./doc/test-components.drawio.svg)
@@ -45,8 +45,10 @@ In order to perform those tests, we have prepared multiple components:
 
 Follow the instructions below prior to executing the tests:
 
-- Install both `node/npm` and `docker`.
-- Run `npm install` in this repository.
+- Install the latest version of `node`: see instructions [here](https://nodejs.org/en/learn/getting-started/how-to-install-nodejs).
+- Install **and start** the `docker` engine for your operating system: see instructions [here](https://docs.docker.com/engine/install/).
+- Run `npm install` in this repository in order to install the dependencies.
+- Connect to our internal Docker registry: see instructions [here](https://app.gitbook.com/o/HBtg1gLTy0nw4NaX0MaV/s/bfdwYZ4RTsNHasAMVAKe/faq/connect-to-azure-docker-registry).
 
 ## Test automation
 
@@ -62,13 +64,13 @@ npm run docker:test
 
 See next sections for more details...
 
-||Linux|MacOS|Windows|
-|-|-|-|-|
-|Direct connection|:white_check_mark:|:white_check_mark:|:question:|
-|Self-signed certificate (OS integration)|:white_check_mark:|:white_check_mark:|:question:|
-|Proxy (OS integration)|:white_check_mark:|:white_check_mark:|:question:|
-|Proxy with basic auth (OS integration)|:white_check_mark:|:white_check_mark:|:question:|
-|PAC file (OS integration)|:warning:|:white_check_mark:|:question:|
+||Linux|MacOS|Windows|Notes|
+|-|-|-|-|-|
+|Direct connection|:white_check_mark:|:white_check_mark:|:white_check_mark:||
+|Self-signed certificate (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:||
+|Proxy (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:||
+|Proxy with basic auth (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:|Requires Electron 32+|
+|PAC file (OS integration)|:warning:|:white_check_mark:|:white_check_mark:|Not natively supported by the Linux OS|
 
 ## Test direct connection
 
@@ -77,6 +79,11 @@ In this case, the app connects directly to the server. There is no intermediate 
 :white_check_mark: **Linux**: this case is covered by the automated tests.
 
 :white_check_mark: **MacOS**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Start the application with `npm run test:app:direct`. It should render all connections with a green background.
+
+:white_check_mark: **Windows**: follow the instructions below.
 
 1. Start the server with `npm run docker:server`.
 1. Start the application with `npm run test:app:direct`. It should render all connections with a green background.
@@ -98,11 +105,21 @@ To be able to use self-signed certificates, an organization must add itself to t
 1. Open the MacOS *Keychain Access*.
 1. Click on *File* > *Import Items*.
 1. Select the certificate [./test/resources/certs/gen/rootCA.crt](./test/resources/certs/gen/rootCA.crt).
-1. Locate the certificate that you just imported in your keychain (it is named *Hackolade-Test-Root-CA*) and double click on it.
-1. In the *Trust* section of the details dialog, choose to *Always Trust* the certificate for SSL.
+1. Locate the certificate that you just imported in your keychain (search for *Hackolade-Test-Root-CA*) and double click on it.
+1. Expand the *Trust* section of the details dialog and choose to *Always Trust* the certificate for SSL.
 1. Close the details dialog to apply your changes.
 1. Start the application with `npm run test:app:cert`. It should render all connections with a green background.
 1. [Optional] You can remove the certificate from your keychain.
+
+:white_check_mark: **Windows**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Using the file explorer, double click on the certificate [./test/resources/certs/gen/rootCA.crt](./test/resources/certs/gen/rootCA.crt).
+1. Click on *Install certificate* in the details dialog.
+1. Click on *Next* until you have the option to select a store. Browser the available stores and select *Trusted Root Certification Authorities* (*Autorités de certification racines de confiance* in French).
+1. Click on *Next* until you complete the installation process.
+1. Start the application with `npm run test:app:cert`. It should render all connections with a green background.
+1. [Optional] You can remove the certificate using the *Windows Certificate Manager* (search for `certmgr.msc` in the *Start* menu).
 
 ## Test connection through a proxy
 
@@ -118,10 +135,23 @@ In this case, the app connects to the server through a proxy.
 1. Navigate to the details of your network connection.
 1. In the details dialog, select *Proxies*.
 1. Enable *Web proxy (HTTP)* and provide the following settings:
-    - Server: *localhost*
+    - Server: *127.0.0.1*
     - Port: *3128*
     - No authentication required
 1. Click on *OK* to apply your changes.
+1. Start the application with `npm run test:app:proxy`. It should render all connections with a green background.
+1. Turn off the proxy.
+
+:white_check_mark: **Windows**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Open the *Settings* app by pressing *Windows+I*.
+1. Select *Network & Internet* in the left menu.
+1. Navigate to the *Proxy* section.
+1. Configure a proxy manually with the following settings:
+    - Server: *127.0.0.1*
+    - Port: *3128*
+1. Click on *Save* to apply your changes.
 1. Start the application with `npm run test:app:proxy`. It should render all connections with a green background.
 1. Turn off the proxy.
 
@@ -164,13 +194,33 @@ utilityProcess.fork(..., { respondToAuthRequestsFromMainProcess: true });
 1. Navigate to the details of your network connection.
 1. In the details dialog, select *Proxies*.
 1. Enable *Web proxy (HTTP)* and provide the following settings:
-    - Server: *localhost*
-    - Port: *3128*
+    - Server: *127.0.0.1*
+    - Port: *3129*
     - Username: *user1*
     - Password: *user1*
 1. Click on *OK* to apply your changes.
 1. Start the application with `npm run test:app:proxy-basic-auth`. It should render all connections with a green background. Note that you won't be prompted for credentials because we hardcoded them.
 1. Turn off the proxy.
+
+:white_check_mark: **Windows**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Open the *Settings* app by pressing *Windows+I*.
+1. Select *Network & Internet* in the left menu.
+1. Navigate to the *Proxy* section.
+1. Configure a proxy manually with the following settings:
+    - Server: *127.0.0.1*
+    - Port: *3129*
+1. Click on *Save* to apply your changes.
+1. Open the Windows *Start* menu and search for *Credential Manager* (*Gestionnaire d'identification* in French).
+1. In the credential manager, click on *Windows Credentials* (*Information d'identification Windows* in French).
+1. Click on *Add a Windows credential* (*Ajouter des informations d'identification Windows*) and provide the following settings:
+    - Network address: *127.0.0.1:3129*
+    - User name: *user1*
+    - Password: *user1*
+1. Click on *OK* to apply your changes.
+1. Start the application with `npm run test:app:proxy-basic-auth`. It should render all connections with a green background. Note that you won't be prompted for credentials because we hardcoded them.
+1. Turn off the proxy. Delete the Windows credential that you created.
 
 ## Test connection through a proxy configured via a PAC file
 
@@ -183,7 +233,18 @@ utilityProcess.fork(..., { respondToAuthRequestsFromMainProcess: true });
 1. Select *Network* in the left menu.
 1. Navigate to the details of your network connection.
 1. In the details dialog, select *Proxies*.
-1. Enable *Auto proxy configuration* and provide the following URL: *http://localhost:8081/proxy.pac*.
+1. Enable *Auto proxy configuration* and provide the following URL: *http://127.0.0.1:8081/proxy.pac*.
 1. Click on *OK* to apply your changes.
+1. Start the application with `npm run test:app:proxy-pac-file`. It should render all connections with a green background.
+1. Turn off the proxy.
+
+:white_check_mark: **Windows**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Open the *Settings* app by pressing *Windows+I*.
+1. Select *Network & Internet* in the left menu.
+1. Navigate to the *Proxy* section.
+1. Choose to use an installation script and provide the following URL: *http://127.0.0.1:8081/proxy.pac*.
+1. Click on *Save* to apply your changes.
 1. Start the application with `npm run test:app:proxy-pac-file`. It should render all connections with a green background.
 1. Turn off the proxy.
