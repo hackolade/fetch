@@ -27,6 +27,7 @@ We need to test that this library behaves as expected in various situations, wha
 - when connecting to a server through a proxy that has been configured at the level of the OS
 - when connecting to a server through a proxy that requires basic authentication
 - when connecting to a server through the proxy returned by a [PAC file](https://en.wikipedia.org/wiki/Proxy_auto-config)
+- when connecting to a server through a proxy that performs [HTTPS inspection](https://www.cloudflare.com/en-gb/learning/security/what-is-https-inspection) using a self-signed certificate
 
 In order to perform those tests, we have prepared multiple components:
 
@@ -72,6 +73,7 @@ See next sections for more details...
 |Proxy (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:||
 |Proxy with basic auth (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:|Requires Electron 32+|
 |PAC file (OS integration)|:warning:|:white_check_mark:|:white_check_mark:|Not natively supported by the Linux OS|
+|Proxy with HTTPS inspection (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:||
 
 ## Test direct connection
 
@@ -249,3 +251,36 @@ utilityProcess.fork(..., { respondToAuthRequestsFromMainProcess: true });
 1. Click on *Save* to apply your changes.
 1. Start the application with `npm run test:app:proxy-pac-file`. It should render all connections with a green background.
 1. Turn off the proxy.
+
+## Test connection through a proxy that performs HTTPS inspection
+
+[HTTPS inspection](https://www.cloudflare.com/en-gb/learning/security/what-is-https-inspection) is the process of checking encrypted web traffic. It relies on a proxy that sets up two separate encrypted connections:
+
+- there is a first HTTPS connection between the client and the proxy where the proxy impersonates the server
+- there is a second HTTPS connection between the proxy and the server where the proxy impersonates the client
+
+Note that the proxy can use a self-signed certificate. This means that establishing the connection with a server can require a custom certificate authority even though the server uses a valid certificate.
+
+:white_check_mark: **Linux**: this case is covered by the automated tests.
+
+:white_check_mark: **MacOS**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Open the MacOS *Keychain Access*.
+1. Click on *File* > *Import Items*.
+1. Select the certificate [./test/resources/certs/gen/rootCA.crt](./test/resources/certs/gen/rootCA.crt).
+1. Locate the certificate that you just imported in your keychain (search for *Hackolade-Test-Root-CA*) and double click on it.
+1. Expand the *Trust* section of the details dialog and choose to *Always Trust* the certificate for SSL.
+1. Close the details dialog to apply your changes.
+1. Start the application with `test:app:proxy-https-inspection`. It should render all connections with a green background.
+1. [Optional] You can remove the certificate from your keychain.
+
+:white_check_mark: **Windows**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Using the file explorer, double click on the certificate [./test/resources/certs/gen/rootCA.crt](./test/resources/certs/gen/rootCA.crt).
+1. Click on *Install certificate* in the details dialog.
+1. Click on *Next* until you have the option to select a store. Browser the available stores and select *Trusted Root Certification Authorities* (*Autorités de certification racines de confiance* in French).
+1. Click on *Next* until you complete the installation process.
+1. Start the application with `test:app:proxy-https-inspection`. It should render all connections with a green background.
+1. [Optional] You can remove the certificate using the *Windows Certificate Manager* (search for `certmgr.msc` in the *Start* menu).
