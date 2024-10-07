@@ -24,6 +24,7 @@
     "test:app:proxy": "cross-env PORT=3003 SERVER_API_URL=http://server:8080/initiators/proxy npm run test:app",
     "test:app:proxy-basic-auth": "cross-env PORT=3004 SERVER_API_URL=http://server:8080/initiators/proxy-basic-auth npm run test:app",
     "test:app:proxy-pac-file": "cross-env PORT=3005 SERVER_API_URL=http://server:8080/initiators/proxy-pac-file npm run test:app",
+    "test:app:proxy-https-inspection": "cross-env PORT=3006 SERVER_API_URL=https://server:4443/initiators/proxy-https-inspection npm run test:app",
     "test:server": "cross-env DEBUG=hck-fetch* node ./test/resources/server/server.js",
     "prepare": "husky"
   },

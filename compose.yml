@@ -3,6 +3,8 @@ configs:
     file: ./test/resources/proxy/squid.conf
   squid-basic-auth:
     file: ./test/resources/proxy/squid-basic-auth.conf
+  squid-https-inspection:
+    file: ./test/resources/proxy/squid-https-inspection.conf
   pac-file:
     file: ./test/resources/proxy/proxy.pac
 
@@ -24,11 +26,11 @@ services:
       - source: squid
         target: /etc/squid/squid.conf
     healthcheck:
-      test: ['CMD', 'sh', '-exec', 'curl -sSL --fail -x $${HEALTH_CHECK_PROXY_URL} https://hackolade.com']
-      interval: 2s
+      test: ['CMD', 'sh', '-exec', 'curl -sSL --insecure --fail -x $${HEALTH_CHECK_PROXY_URL} https://hackolade.com']
+      interval: 60s
       timeout: 2s
       retries: 5
-      start_period: 1s
+      start_period: 5s
 
   proxy-basic-auth:
     <<: *proxy
@@ -38,6 +40,14 @@ services:
       - HEALTH_CHECK_PROXY_URL=http://user1:user1@localhost:3128
     configs:
       - source: squid-basic-auth
+        target: /etc/squid/squid.conf
+
+  proxy-https-inspection:
+    <<: *proxy
+    ports:
+      - 3130:3128
+    configs:
+      - source: squid-https-inspection
         target: /etc/squid/squid.conf
 
   nginx:
@@ -66,14 +76,16 @@ services:
       - 4443:4443
     healthcheck:
       test: ['CMD', 'sh', '-exec', 'curl -sSL --fail localhost:8080/status']
-      interval: 2s
+      interval: 60s
       timeout: 2s
       retries: 5
-      start_period: 1s
+      start_period: 5s
     depends_on:
       proxy:
         condition: service_healthy
       proxy-basic-auth:
+        condition: service_healthy
+      proxy-https-inspection:
         condition: service_healthy
       nginx:
         condition: service_healthy
@@ -88,10 +100,10 @@ services:
     network_mode: host
     healthcheck:
       test: ['CMD', 'sh', '-exec', 'curl -sSL --fail localhost:$${PORT}/status']
-      interval: 2s
+      interval: 60s
       timeout: 2s
       retries: 5
-      start_period: 1s
+      start_period: 5s
     depends_on:
       server:
         condition: service_healthy
@@ -128,6 +140,15 @@ services:
       - HTTP_PROXY=http://user1:user1@localhost:3129
       - HTTPS_PROXY=http://user1:user1@localhost:3129
 
+  app-proxy-https-inspection:
+    <<: *app
+    profiles: [test]
+    environment:
+      - PORT=3005
+      - SERVER_API_URL=https://server:4443/initiators/proxy-https-inspection
+      - HTTP_PROXY=http://localhost:3130
+      - HTTPS_PROXY=http://localhost:3130
+
   tests:
     profiles: [test]
     build:
@@ -145,4 +166,6 @@ services:
       app-proxy:
         condition: service_healthy
       app-proxy-basic-auth:
+        condition: service_healthy
+      app-proxy-https-inspection:
         condition: service_healthy

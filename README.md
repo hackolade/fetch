@@ -36,6 +36,7 @@ In order to perform those tests, we have prepared multiple components:
 |`app`|NA|This is an Electron application. It contacts the server from both the *main* process, a *renderer* process and a *utility* process. Each process registers itself as a distinct `:initiator`: `main`, `renderer` and `utility` respectively. The base URL of the endpoint - including the `:connectionType` - is passed to the application through an environment variable, making it possible to start different instances of the application to cover different cases (e.g. direct connection, connection through a proxy).|
 |`proxy`|http://127.0.0.1:3128|This is a proxy that does not require authentication.|
 |`proxy-basic-auth`|http://127.0.0.1:3129|This is a proxy that requires basic authentication. You can use `user1` as both username and password.|
+|`proxy-https-inspection`|http://127.0.0.1:3130|This is a proxy that performs HTTPS inspection using a self-signed certificate.|
 |PAC file|http://127.0.0.1:8081/proxy.pac|This is a PAC file that leads to using the proxy that does not require authentication.|
 |`tests`|NA|This is a set of tests that query the REST API of the server to verify that all clients could successfully register themselves, whatever the context of the connection.|
 
