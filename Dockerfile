@@ -77,5 +77,6 @@ ENTRYPOINT [ "npm", "run", "test" ]
 
 # Extend Squid image to log to stdout
 FROM hackolade.azurecr.io/squid-proxy:latest AS hck-fetch-test-proxy
-RUN chown -R proxy:proxy /apps
+COPY ./test/resources/certs/gen/rootCA.pem /etc/squid/ssl_cert/rootCA.pem
+RUN chown -R proxy:proxy /apps /etc/squid
 USER proxy

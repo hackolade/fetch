@@ -57,4 +57,16 @@ describe('@hackolade/fetch library', () => {
   it('should reach the server from the utility process through a proxy with basic authentication', async () => {
     await assertServerReachedFrom('proxy-basic-auth', 'utility');
   });
+
+  it('should reach the server from the main process through a proxy that does HTTPS inspection using a self-signed certificate', async () => {
+    await assertServerReachedFrom('proxy-https-inspection', 'main');
+  });
+
+  it('should reach the server from the renderer process through a proxy that does HTTPS inspection using a self-signed certificate', async () => {
+    await assertServerReachedFrom('proxy-https-inspection', 'renderer');
+  });
+
+  it('should reach the server from the utility process through a proxy that does HTTPS inspection using a self-signed certificate', async () => {
+    await assertServerReachedFrom('proxy-https-inspection', 'utility');
+  });
 });
