@@ -1,7 +1,7 @@
-# syntax=docker/dockerfile:1.8
+# syntax=docker/dockerfile:1.10
 
-ARG NODEJS_MAJOR_VERSION=18
-FROM node:${NODEJS_MAJOR_VERSION} AS node-runtime
+ARG NODEJS_MAJOR_VERSION=20
+FROM hackolade.azurecr.io/node:${NODEJS_MAJOR_VERSION} AS node-runtime
 
 # Install pre-requisites for running Electron in Docker
 FROM node-runtime AS electron-runtime
