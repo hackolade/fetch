@@ -1,8 +1,9 @@
-const { readFile, writeFile } = require('node:fs/promises');
+const { copyFile, readFile, writeFile } = require('node:fs/promises');
 const path = require('node:path');
 
 const rootDir = path.resolve(__dirname, '..');
 const distDir = path.join(rootDir, 'dist');
+const srcDir = path.join(rootDir, 'src');
 
 /**
  * Converts the given root-relative path to a dist-relative path.
@@ -21,7 +22,7 @@ function toDistRelativePath(rootRelativePath) {
       `The content of ${rootRelativePath} is not included in the ${path.basename(distDir)} folder and will be missing on NPM!`,
     );
   }
-  return path.relative(distDir, rootRelativePath);
+  return `./${path.relative(distDir, rootRelativePath)}`;
 }
 
 /**
@@ -42,6 +43,7 @@ async function getPackage() {
         require: toDistRelativePath(parsed.exports['.'].require),
       },
     },
+    types: toDistRelativePath(parsed.types),
     dependencies: parsed.dependencies || {},
   };
 }
@@ -59,6 +61,7 @@ async function generatePackageFile() {
  */
 async function preparePublishingToNPM() {
   await generatePackageFile();
+  await copyFile(path.join(srcDir, 'index.d.ts'), path.join(distDir, 'index.d.ts'));
 }
 
 preparePublishingToNPM();

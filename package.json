@@ -10,6 +10,7 @@
       "require": "./dist/cjs/index.cjs"
     }
   },
+  "types": "./dist/index.d.ts",
   "workspaces": [
     "dist"
   ],
@@ -31,7 +32,7 @@
     "test:app:proxy-https-inspection": "cross-env PORT=3006 SERVER_API_URL=https://server:4443/initiators/proxy-https-inspection npm run test:app",
     "test:server": "cross-env DEBUG=hck-fetch* node ./test/resources/server/server.js",
     "prepare": "husky",
-    "prepublish": "npm run build && node ./scripts/pre-publish.js"
+    "release": "npm run build && node ./scripts/pre-publish.js && npm publish --workspace dist"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
