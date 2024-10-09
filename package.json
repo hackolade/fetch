@@ -1,6 +1,6 @@
 {
   "name": "@hackolade/fetch",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A HTTP client that works in the browser and in Electron",
   "main": "./dist/cjs/index.cjs",
   "module": "./dist/esm/index.mjs",
@@ -10,7 +10,10 @@
       "require": "./dist/cjs/index.cjs"
     }
   },
+  "types": "./src/index.d.ts",
+  "files": ["./doc", "./dist", "./src"],
   "scripts": {
+    "prebuild": "rimraf ./dist",
     "build": "swc -C module.type=es6 ./src -o ./dist/esm/index.mjs && swc -C module.type=commonjs ./src -o ./dist/cjs/index.cjs",
     "docker:compose": "docker compose --profile=test up --build --force-recreate --always-recreate-deps --remove-orphans",
     "docker:server": "npm run docker:compose -- server",
@@ -26,7 +29,8 @@
     "test:app:proxy-pac-file": "cross-env PORT=3005 SERVER_API_URL=http://server:8080/initiators/proxy-pac-file npm run test:app",
     "test:app:proxy-https-inspection": "cross-env PORT=3006 SERVER_API_URL=https://server:4443/initiators/proxy-https-inspection npm run test:app",
     "test:server": "cross-env DEBUG=hck-fetch* node ./test/resources/server/server.js",
-    "prepare": "husky"
+    "prepare": "husky",
+    "prepublishOnly": "npm run build"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
@@ -40,6 +44,7 @@
     "express": "4.21.1",
     "husky": "9.1.6",
     "lint-staged": "15.2.10",
-    "prettier": "3.3.3"
+    "prettier": "3.3.3",
+    "rimraf": "6.0.1"
   }
 }
