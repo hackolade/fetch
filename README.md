@@ -1,6 +1,6 @@
 # fetch
 
-This is the HTTP client that must be used by both Hackolade Studio and its plugins.
+This is the HTTP client that must be used by both [Hackolade Studio](https://hackolade.com/) and its plugins.
 It takes into account the proxies and the custom certificate authorities that are configured at the level of the operating system.
 So it removes the need for the end user to deal with network settings in Hackolade Studio.
 

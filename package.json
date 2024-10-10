@@ -1,6 +1,6 @@
 {
   "name": "@hackolade/fetch",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A HTTP client that works in the browser and in Electron",
   "main": "./dist/cjs/index.cjs",
   "module": "./dist/esm/index.mjs",
@@ -14,6 +14,7 @@
   "files": ["./doc", "./dist", "./src"],
   "keywords": ["http", "https", "client", "fetch", "electron", "proxy", "certificate", "cert"],
   "license": "MIT",
+  "repository": "github:hackolade/fetch",
   "scripts": {
     "prebuild": "rimraf ./dist",
     "build": "swc -C module.type=es6 ./src -o ./dist/esm/index.mjs && swc -C module.type=commonjs ./src -o ./dist/cjs/index.cjs",
