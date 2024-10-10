@@ -19,8 +19,11 @@ This library returns the proper implementation of *fetch()* depending on the run
 
 ## Release process
 
-1. Bump the semantic `version` in [package.json](./package.json). Push/merge that change into the branch that you plan to release (`develop` typically).
-1. Trigger [the release workflow](https://github.com/hackolade/fetch/actions/workflows/release.yml) from the GitHub *Actions* for that branch. It will publish the library to the NPM registry as [@hackolade/fetch](https://www.npmjs.com/package/@hackolade/fetch). It will also create a GitHub release.
+1. Open a pull request to bump the semantic `version` in [package.json](./package.json).
+1. Set the title of your pull request to `Release v<major>.<minor>.<patch>`.
+1. Document the content of the release in the description of your pull request.
+1. Merge the pull request into the branch that you plan to release (`develop` typically).
+1. Trigger [the release workflow](https://github.com/hackolade/fetch/actions/workflows/release.yml) from the GitHub *Actions* for that branch. It will publish the library to the NPM registry as [@hackolade/fetch](https://www.npmjs.com/package/@hackolade/fetch). It will also create a [GitHub release](https://github.com/hackolade/fetch/releases) with the same description as the pull request you created.
 
 ## Tests components
 
