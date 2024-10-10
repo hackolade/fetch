@@ -17,6 +17,11 @@ This library returns the proper implementation of *fetch()* depending on the run
 - it returns the native [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) in a browser, as well as in a Electron `renderer` process
 - it returns [net.fetch](https://www.electronjs.org/docs/latest/api/net#netfetchinput-init) in the Electron `main` and `utility` processes
 
+## Release process
+
+1. Bump the semantic `version` in [package.json](./package.json). Push/merge that change into the branch that you plan to release (`develop` typically).
+1. Trigger [the release workflow](https://github.com/hackolade/fetch/actions/workflows/release.yml) from the GitHub *Actions* for that branch. It will publish the library to the NPM registry as [@hackolade/fetch](https://www.npmjs.com/package/@hackolade/fetch). It will also create a GitHub release.
+
 ## Tests components
 
 We need to test that this library behaves as expected in various situations, whatever the OS of the user:
