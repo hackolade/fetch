@@ -32,10 +32,11 @@ We need to test that this library behaves as expected in various situations, wha
 - in both the `main` process, a `renderer` process and a `utility` process
 - when connecting directly to a server (aka when no proxy is involved)
 - when connecting to a server that uses a self-signed certificate whose authority has been installed in the trust store of the OS
-- when connecting to a server through a proxy that has been configured at the level of the OS
-- when connecting to a server through a proxy that requires basic authentication
-- when connecting to a server through the proxy returned by a [PAC file](https://en.wikipedia.org/wiki/Proxy_auto-config)
-- when connecting to a server through a proxy that performs [HTTPS inspection](https://www.cloudflare.com/en-gb/learning/security/what-is-https-inspection) using a self-signed certificate
+- when connecting to a server through a proxy that has been configured either at the level of the OS, either manually in the application
+  - through a simple proxy
+  - through a proxy that requires basic authentication
+  - through the proxy returned by a [PAC file](https://en.wikipedia.org/wiki/Proxy_auto-config)
+  - through a proxy that performs [HTTPS inspection](https://www.cloudflare.com/en-gb/learning/security/what-is-https-inspection) using a self-signed certificate
 
 In order to perform those tests, we have prepared multiple components:
 
@@ -77,11 +78,16 @@ See next sections for more details...
 ||Linux|MacOS|Windows|Notes|
 |-|-|-|-|-|
 |Direct connection|:white_check_mark:|:white_check_mark:|:white_check_mark:||
-|Self-signed certificate (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:||
-|Proxy (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:||
-|Proxy with basic auth (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:|Requires Electron 32+|
-|PAC file (OS integration)|:warning:|:white_check_mark:|:white_check_mark:|Not natively supported by the Linux OS|
-|Proxy with HTTPS inspection (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:||
+|**OS SETTINGS**|||||
+|Self-signed certificate|:white_check_mark:|:white_check_mark:|:white_check_mark:||
+|Proxy|:white_check_mark:|:white_check_mark:|:white_check_mark:||
+|Proxy with basic auth|:white_check_mark:|:white_check_mark:|:white_check_mark:|Requires Electron 32+|
+|PAC file|:warning:|:white_check_mark:|:white_check_mark:|Not natively supported by the Linux OS|
+|Proxy with HTTPS inspection|:white_check_mark:|:white_check_mark:|:white_check_mark:||
+|**APP SETTINGS**|||||
+|Proxy|:white_check_mark:|:white_check_mark:|:white_check_mark:||
+|Proxy with basic auth|:white_check_mark:|:white_check_mark:|:white_check_mark:|Requires Electron 32+|
+|PAC file|:white_check_mark:|:white_check_mark:|:white_check_mark:||
 
 ## Test direct connection
 

@@ -149,6 +149,30 @@ services:
       - HTTP_PROXY=http://localhost:3130
       - HTTPS_PROXY=http://localhost:3130
 
+  app-custom-proxy:
+    <<: *app
+    profiles: [test]
+    environment:
+      - PORT=3006
+      - SERVER_API_URL=http://server:8080/initiators/custom-proxy
+      - CUSTOM_PROXY_RULES=localhost:3128
+
+  app-custom-proxy-basic-auth:
+    <<: *app
+    profiles: [test]
+    environment:
+      - PORT=3007
+      - SERVER_API_URL=http://server:8080/initiators/custom-proxy-basic-auth
+      - CUSTOM_PROXY_RULES=localhost:3129
+
+  app-custom-proxy-pac:
+    <<: *app
+    profiles: [test]
+    environment:
+      - PORT=3008
+      - SERVER_API_URL=http://server:8080/initiators/custom-proxy-pac
+      - CUSTOM_PROXY_PAC_SCRIPT=http://127.0.0.1:8081/proxy.pac
+
   tests:
     profiles: [test]
     build:
@@ -168,4 +192,6 @@ services:
       app-proxy-basic-auth:
         condition: service_healthy
       app-proxy-https-inspection:
+        condition: service_healthy
+      app-custom-proxy:
         condition: service_healthy
