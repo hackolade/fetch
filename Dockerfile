@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.10
 
 ARG NODEJS_MAJOR_VERSION=20
-FROM hackolade.azurecr.io/node:${NODEJS_MAJOR_VERSION} AS node-runtime
+FROM node:${NODEJS_MAJOR_VERSION} AS node-runtime
 
 # Install pre-requisites for running Electron in Docker
 FROM node-runtime AS electron-runtime
@@ -76,7 +76,7 @@ FROM hck-fetch-runtime AS hck-fetch-tests
 ENTRYPOINT [ "npm", "run", "test" ]
 
 # Extend Squid image to log to stdout
-FROM hackolade.azurecr.io/squid-proxy:latest AS hck-fetch-test-proxy
+FROM bigorn0/squid-proxy:latest AS hck-fetch-test-proxy
 COPY ./test/resources/certs/gen/rootCA.pem /etc/squid/ssl_cert/rootCA.pem
 RUN chown -R proxy:proxy /apps /etc/squid
 USER proxy
