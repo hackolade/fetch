@@ -81,12 +81,12 @@ See next sections for more details...
 |**OS SETTINGS**|||||
 |Self-signed certificate|:white_check_mark:|:white_check_mark:|:white_check_mark:||
 |Proxy|:white_check_mark:|:white_check_mark:|:white_check_mark:||
-|Proxy with basic auth|:white_check_mark:|:white_check_mark:|:white_check_mark:|Requires Electron 32+|
+|Proxy with basic auth|:white_check_mark:|:warning:|:white_check_mark:|['login' event](https://www.electronjs.org/docs/latest/api/app#event-login) not emitted for `main` process|
 |PAC file|:warning:|:white_check_mark:|:white_check_mark:|Not natively supported by the Linux OS|
 |Proxy with HTTPS inspection|:white_check_mark:|:white_check_mark:|:white_check_mark:||
 |**APP SETTINGS**|||||
 |Proxy|:white_check_mark:|:white_check_mark:|:white_check_mark:||
-|Proxy with basic auth|:white_check_mark:|:white_check_mark:|:white_check_mark:|Requires Electron 32+|
+|Proxy with basic auth|:white_check_mark:|:warning:|:white_check_mark:|['login' event](https://www.electronjs.org/docs/latest/api/app#event-login) not emitted for `main` process|
 |PAC file|:white_check_mark:|:white_check_mark:|:white_check_mark:||
 
 ## Test direct connection
@@ -202,7 +202,7 @@ utilityProcess.fork(..., { respondToAuthRequestsFromMainProcess: true });
 
 :white_check_mark: **Linux**: this case is covered by the automated tests. Note that the proxy is configured through the environment variables `HTTP_PROXY` and `HTTPS_PROXY`, which is the standard way of configuring proxies in Linux.
 
-:white_check_mark: **MacOS**: follow the instructions below.
+:warning: **MacOS**: follow the instructions below. Note that the server cannot be contacted from the `main` process because [the 'login' event](https://www.electronjs.org/docs/latest/api/app#event-login) (see code snippet above) is not emitted for that process, which ultimately leads to a `HTTP #407 Proxy Authentication Required`.
 
 1. Start the server with `npm run docker:server`.
 1. Open the MacOS *System Settings*.
@@ -310,7 +310,12 @@ In this case, the app connects to the server through a proxy that has been confi
 
 :white_check_mark: **Linux**: this case is covered by the automated tests.
 
-:white_check_mark: **MacOS**, :white_check_mark: **Windows**: follow the instructions below.
+:white_check_mark: **MacOS**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Start the application with `npm run test:app:custom-proxy`. It should render all connections with a green background.
+
+:white_check_mark: **Windows**: follow the instructions below.
 
 1. Start the server with `npm run docker:server`.
 1. Start the application with `npm run test:app:custom-proxy`. It should render all connections with a green background.
@@ -321,7 +326,12 @@ In this case, the app connects to the server through a proxy that has been confi
 
 :white_check_mark: **Linux**: this case is covered by the automated tests.
 
-:white_check_mark: **MacOS**, :white_check_mark: **Windows**: follow the instructions below.
+:warning: **MacOS**: follow the instructions below. Note that the server cannot be contacted from the `main` process because [the 'login' event](https://www.electronjs.org/docs/latest/api/app#event-login) is not emitted for that process, which ultimately leads to a `HTTP #407 Proxy Authentication Required`.
+
+1. Start the server with `npm run docker:server`.
+1. Start the application with `npm run test:app:custom-proxy-basic-auth`. It should render all connections with a green background.
+
+:white_check_mark: **Windows**: follow the instructions below.
 
 1. Start the server with `npm run docker:server`.
 1. Start the application with `npm run test:app:custom-proxy-basic-auth`. It should render all connections with a green background.
@@ -332,7 +342,12 @@ In this case, the app connects to the server through the proxy that is returned 
 
 :white_check_mark: **Linux**: this case is covered by the automated tests.
 
-:white_check_mark: **MacOS**, :white_check_mark: **Windows**: follow the instructions below.
+:white_check_mark: **MacOS**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Start the application with `npm run test:app:custom-proxy-pac-file`. It should render all connections with a green background.
+
+:white_check_mark: **Windows**: follow the instructions below.
 
 1. Start the server with `npm run docker:server`.
 1. Start the application with `npm run test:app:custom-proxy-pac-file`. It should render all connections with a green background.
