@@ -1,14 +1,14 @@
 # fetch
 
-This is the HTTP client that must be used by both [Hackolade Studio](https://hackolade.com/) and its plugins.
-It takes into account the proxies and the custom certificate authorities that are configured at the level of the operating system.
-So it removes the need for the end user to deal with network settings in Hackolade Studio.
+This is the HTTP client for [Hackolade Studio](https://hackolade.com/) and its plugins.
+It takes into account the proxies and the custom certificate authorities that are configured at the level of the operating system, which removes the need for the end user to deal with complex network settings in Hackolade Studio.
+It also supports configuring custom network settings in the desktop application if needed.
 
 ## Context
 
 Web browsers provide natively the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
 In Electron, that API was originally only available in the `renderer` process (which is basically a browser).
-It is now also available in the `main` process and in `utility` processes via [net.fetch](https://www.electronjs.org/docs/latest/api/net#netfetchinput-init).
+It is now also available in the `main` process and in `utility` processes via [net.fetch](https://www.electronjs.org/docs/latest/api/net#netfetchinput-init). Since that function uses the Chrome's network stack, it also benefits from the integration with the OS trust store (for validating self-signed-certificates) and network settings (for detecting proxies).
 
 ## Approach
 
@@ -32,10 +32,11 @@ We need to test that this library behaves as expected in various situations, wha
 - in both the `main` process, a `renderer` process and a `utility` process
 - when connecting directly to a server (aka when no proxy is involved)
 - when connecting to a server that uses a self-signed certificate whose authority has been installed in the trust store of the OS
-- when connecting to a server through a proxy that has been configured at the level of the OS
-- when connecting to a server through a proxy that requires basic authentication
-- when connecting to a server through the proxy returned by a [PAC file](https://en.wikipedia.org/wiki/Proxy_auto-config)
-- when connecting to a server through a proxy that performs [HTTPS inspection](https://www.cloudflare.com/en-gb/learning/security/what-is-https-inspection) using a self-signed certificate
+- when connecting to a server through a proxy that has been configured either at the level of the OS, either manually in the application
+  - through a simple proxy
+  - through a proxy that requires basic authentication
+  - through the proxy returned by a [PAC file](https://en.wikipedia.org/wiki/Proxy_auto-config)
+  - through a proxy that performs [HTTPS inspection](https://www.cloudflare.com/en-gb/learning/security/what-is-https-inspection) using a self-signed certificate
 
 In order to perform those tests, we have prepared multiple components:
 
@@ -58,7 +59,6 @@ Follow the instructions below prior to executing the tests:
 - Install the latest version of `node`: see instructions [here](https://nodejs.org/en/learn/getting-started/how-to-install-nodejs).
 - Install **and start** the `docker` engine for your operating system: see instructions [here](https://docs.docker.com/engine/install/).
 - Run `npm install` in this repository in order to install the dependencies.
-- Connect to our internal Docker registry: see instructions [here](https://app.gitbook.com/o/HBtg1gLTy0nw4NaX0MaV/s/bfdwYZ4RTsNHasAMVAKe/faq/connect-to-azure-docker-registry).
 
 ## Test automation
 
@@ -77,11 +77,16 @@ See next sections for more details...
 ||Linux|MacOS|Windows|Notes|
 |-|-|-|-|-|
 |Direct connection|:white_check_mark:|:white_check_mark:|:white_check_mark:||
-|Self-signed certificate (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:||
-|Proxy (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:||
-|Proxy with basic auth (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:|Requires Electron 32+|
-|PAC file (OS integration)|:warning:|:white_check_mark:|:white_check_mark:|Not natively supported by the Linux OS|
-|Proxy with HTTPS inspection (OS integration)|:white_check_mark:|:white_check_mark:|:white_check_mark:||
+|**OS SETTINGS**|||||
+|Self-signed certificate|:white_check_mark:|:white_check_mark:|:white_check_mark:||
+|Proxy|:white_check_mark:|:white_check_mark:|:white_check_mark:||
+|Proxy with basic auth|:white_check_mark:|:warning:|:warning:|['login' event](https://www.electronjs.org/docs/latest/api/app#event-login) not emitted for `main` process|
+|PAC file|:warning:|:white_check_mark:|:white_check_mark:|Not natively supported by the Linux OS|
+|Proxy with HTTPS inspection|:white_check_mark:|:white_check_mark:|:white_check_mark:||
+|**APP SETTINGS**|||||
+|Proxy|:white_check_mark:|:white_check_mark:|:white_check_mark:||
+|Proxy with basic auth|:white_check_mark:|:warning:|:warning:|['login' event](https://www.electronjs.org/docs/latest/api/app#event-login) not emitted for `main` process|
+|PAC file|:white_check_mark:|:white_check_mark:|:white_check_mark:||
 
 ## Test direct connection
 
@@ -89,17 +94,16 @@ In this case, the app connects directly to the server. There is no intermediate 
 
 :white_check_mark: **Linux**: this case is covered by the automated tests.
 
-:white_check_mark: **MacOS**: follow the instructions below.
+:white_check_mark: **MacOS**, :white_check_mark: **Windows**: follow the instructions below.
 
 1. Start the server with `npm run docker:server`.
 1. Start the application with `npm run test:app:direct`. It should render all connections with a green background.
 
-:white_check_mark: **Windows**: follow the instructions below.
+## Test integration with OS settings
 
-1. Start the server with `npm run docker:server`.
-1. Start the application with `npm run test:app:direct`. It should render all connections with a green background.
+The test cases that are described in this section cover the integration with the OS trust store (for validating self-signed-certificates) and network settings (for detecting proxies).
 
-## Test connection involving a self-signed certificate
+### [OS] Test connection involving a self-signed certificate
 
 For a certificate to be considered valid, it must be signed by a trusted certificate authority (CA), such as *GlobalSign* or *DigiCert*.
 Obtaining such a certificate used to cost some money (this is not true anymore thanks to *[Let's Encrypt](https://letsencrypt.org/)*, a nonprofit certificate authority).
@@ -132,9 +136,9 @@ To be able to use self-signed certificates, an organization must add itself to t
 1. Start the application with `npm run test:app:cert`. It should render all connections with a green background.
 1. [Optional] You can remove the certificate using the *Windows Certificate Manager* (search for `certmgr.msc` in the *Start* menu).
 
-## Test connection through a proxy
+### [OS] Test connection through a proxy
 
-In this case, the app connects to the server through a proxy.
+In this case, the app connects to the server through a proxy that has been configured in the OS.
 
 :white_check_mark: **Linux**: this case is covered by the automated tests. Note that the proxy is configured through the environment variables `HTTP_PROXY` and `HTTPS_PROXY`, which is the standard way of configuring proxies in Linux.
 
@@ -166,9 +170,9 @@ In this case, the app connects to the server through a proxy.
 1. Start the application with `npm run test:app:proxy`. It should render all connections with a green background.
 1. Turn off the proxy.
 
-## Test connection through a proxy that requires basic authentication
+### [OS] Test connection through a proxy that requires basic authentication
 
-In this case, the app connects to the server through a proxy that requires a username and a password. Even though the credentials might have been set at the level of the operating system, the user needs to provide them interactively to the Electron application. Note that this is also the case for other apps such as Slack or Docker Desktop.
+In this case, the app connects to the server through a proxy that has been configured in the OS. That proxy requires a username and a password. Even though the username and the password might have been set at the level of the operating system, the user needs to provide them interactively to the Electron application. It is also the case for other apps such as Slack or Docker Desktop.
 
 The `main` process must handle the [login](https://www.electronjs.org/docs/latest/api/app#event-login) event and prompt the user for the proxy credentials.
 
@@ -197,7 +201,7 @@ utilityProcess.fork(..., { respondToAuthRequestsFromMainProcess: true });
 
 :white_check_mark: **Linux**: this case is covered by the automated tests. Note that the proxy is configured through the environment variables `HTTP_PROXY` and `HTTPS_PROXY`, which is the standard way of configuring proxies in Linux.
 
-:white_check_mark: **MacOS**: follow the instructions below.
+:warning: **MacOS**: follow the instructions below. Note that the server cannot be contacted from the `main` process because [the 'login' event](https://www.electronjs.org/docs/latest/api/app#event-login) (see code snippet above) is not emitted for that process, which ultimately leads to a `HTTP #407 Proxy Authentication Required`.
 
 1. Start the server with `npm run docker:server`.
 1. Open the MacOS *System Settings*.
@@ -233,7 +237,9 @@ utilityProcess.fork(..., { respondToAuthRequestsFromMainProcess: true });
 1. Start the application with `npm run test:app:proxy-basic-auth`. It should render all connections with a green background. Note that you won't be prompted for credentials because we hardcoded them.
 1. Turn off the proxy. Delete the Windows credential that you created.
 
-## Test connection through a proxy configured via a PAC file
+### [OS] Test connection through a proxy configured via a PAC file
+
+In this case, the app connects to the server through the proxy that is returned by a PAC file that has been configured in the OS.
 
 :warning: **Linux**: PAC files are not natively supported by Linux, aka you cannot set `HTTP_PROXY` or `HTTPS_PROXY` to the URL of a PAC file. Linux requires the application itself to provide support for PAC files. That's because PAC files were originally meant to be used by browsers (see [here](https://en.wikipedia.org/wiki/Proxy_auto-config)). That's why they are JavaScript files.
 
@@ -260,7 +266,7 @@ utilityProcess.fork(..., { respondToAuthRequestsFromMainProcess: true });
 1. Start the application with `npm run test:app:proxy-pac-file`. It should render all connections with a green background.
 1. Turn off the proxy.
 
-## Test connection through a proxy that performs HTTPS inspection
+### [OS] Test connection through a proxy that performs HTTPS inspection
 
 [HTTPS inspection](https://www.cloudflare.com/en-gb/learning/security/what-is-https-inspection) is the process of checking encrypted web traffic. It relies on a proxy that sets up two separate encrypted connections:
 
@@ -292,3 +298,47 @@ Note that the proxy can use a self-signed certificate. This means that establish
 1. Click on *Next* until you complete the installation process.
 1. Start the application with `test:app:proxy-https-inspection`. It should render all connections with a green background.
 1. [Optional] You can remove the certificate using the *Windows Certificate Manager* (search for `certmgr.msc` in the *Start* menu).
+
+## Test custom application settings
+
+The test cases that are described in this section cover the configuration of custom network settings in the application itself.
+
+### [APP] Test connection through a proxy
+
+In this case, the app connects to the server through a proxy that has been configured in the app itself.
+
+:white_check_mark: **Linux**: this case is covered by the automated tests.
+
+:white_check_mark: **MacOS**, :white_check_mark: **Windows**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Start the application with `npm run test:app:custom-proxy`. It should render all connections with a green background.
+
+### [APP] Test connection through a proxy that requires basic authentication
+
+In this case, the app connects to the server through a proxy that has been configured in the app itself. That proxy requires a username and a password.
+
+:white_check_mark: **Linux**: this case is covered by the automated tests.
+
+:warning: **MacOS**, :warning: **Windows**: follow the instructions below. Note that the server cannot be contacted from the `main` process because [the 'login' event](https://www.electronjs.org/docs/latest/api/app#event-login) is not emitted for that process, which ultimately leads to a `HTTP #407 Proxy Authentication Required`.
+
+1. Start the server with `npm run docker:server`.
+1. Start the application with `npm run test:app:custom-proxy-basic-auth`. It should render all connections with a green background.
+
+### [APP] Test connection through a proxy configured via a PAC file
+
+In this case, the app connects to the server through the proxy that is returned by a PAC file that has been configured in the app itself.
+
+:white_check_mark: **Linux**: this case is covered by the automated tests.
+
+:white_check_mark: **MacOS**, :white_check_mark: **Windows**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Start the application with `npm run test:app:custom-proxy-pac-file`. It should render all connections with a green background.
+
+## Known Issues
+
+### I am on Windows and I get the error "$'\r': command not found"
+
+This problem is related to line break differences between operating systems.
+To fix it, just save the [Dockerfile](./Dockerfile) using the LF line break (e.g. from the status bar in Visual Studio Code).
