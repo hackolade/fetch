@@ -339,7 +339,7 @@ In this case, the app connects to the server through the proxy that is returned 
 
 ## Known Issues
 
-**I am on Windows and I get the error "$'\r': command not found"**
+### I am on Windows and I get the error "$'\r': command not found"**
 
 This problem is related to line break differences between operating systems.
 To fix it, just save the [Dockerfile](./Dockerfile) using the LF line break (e.g. from the status bar in Visual Studio Code).
