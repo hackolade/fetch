@@ -98,15 +98,15 @@ describe('@hackolade/fetch library', () => {
     });
 
     it('should reach the server from the main process through the proxy returned by a PAC file', async () => {
-      await assertServerReachedFrom('custom-proxy-pac', 'main');
+      await assertServerReachedFrom('custom-proxy-pac-file', 'main');
     });
 
     it('should reach the server from the renderer process through the proxy returned by a PAC file', async () => {
-      await assertServerReachedFrom('custom-proxy-pac', 'renderer');
+      await assertServerReachedFrom('custom-proxy-pac-file', 'renderer');
     });
 
     it('should reach the server from the utility process through the proxy returned by a PAC file', async () => {
-      await assertServerReachedFrom('custom-proxy-pac', 'utility');
+      await assertServerReachedFrom('custom-proxy-pac-file', 'utility');
     });
   });
 });

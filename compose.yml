@@ -165,12 +165,12 @@ services:
       - SERVER_API_URL=http://server:8080/initiators/custom-proxy-basic-auth
       - CUSTOM_PROXY_RULES=localhost:3129
 
-  app-custom-proxy-pac:
+  app-custom-proxy-pac-file:
     <<: *app
     profiles: [test]
     environment:
       - PORT=3008
-      - SERVER_API_URL=http://server:8080/initiators/custom-proxy-pac
+      - SERVER_API_URL=http://server:8080/initiators/custom-proxy-pac-file
       - CUSTOM_PROXY_PAC_SCRIPT=http://127.0.0.1:8081/proxy.pac
 
   tests:
