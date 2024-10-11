@@ -197,5 +197,5 @@ services:
         condition: service_healthy
       app-custom-proxy-basic-auth:
         condition: service_healthy
-      app-custom-proxy-pac:
+      app-custom-proxy-pac-file:
         condition: service_healthy
