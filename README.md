@@ -1,14 +1,14 @@
 # fetch
 
-This is the HTTP client that must be used by both [Hackolade Studio](https://hackolade.com/) and its plugins.
-It takes into account the proxies and the custom certificate authorities that are configured at the level of the operating system.
-So it removes the need for the end user to deal with network settings in Hackolade Studio.
+This is the HTTP client for [Hackolade Studio](https://hackolade.com/) and its plugins.
+It takes into account the proxies and the custom certificate authorities that are configured at the level of the operating system, which removes the need for the end user to deal with complex network settings in Hackolade Studio.
+It also supports configuring custom network settings in the desktop application if needed.
 
 ## Context
 
 Web browsers provide natively the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
 In Electron, that API was originally only available in the `renderer` process (which is basically a browser).
-It is now also available in the `main` process and in `utility` processes via [net.fetch](https://www.electronjs.org/docs/latest/api/net#netfetchinput-init).
+It is now also available in the `main` process and in `utility` processes via [net.fetch](https://www.electronjs.org/docs/latest/api/net#netfetchinput-init). Since that function uses the Chrome's network stack, it also benefits from the integration with the OS trust store (for validating self-signed-certificates) and network settings (for detecting proxies).
 
 ## Approach
 
@@ -59,7 +59,7 @@ Follow the instructions below prior to executing the tests:
 - Install the latest version of `node`: see instructions [here](https://nodejs.org/en/learn/getting-started/how-to-install-nodejs).
 - Install **and start** the `docker` engine for your operating system: see instructions [here](https://docs.docker.com/engine/install/).
 - Run `npm install` in this repository in order to install the dependencies.
-- Connect to our internal Docker registry: see instructions [here](https://app.gitbook.com/o/HBtg1gLTy0nw4NaX0MaV/s/bfdwYZ4RTsNHasAMVAKe/faq/connect-to-azure-docker-registry).
+- Connect to the Hackolade's internal Docker registry: see instructions [here](https://app.gitbook.com/o/HBtg1gLTy0nw4NaX0MaV/s/bfdwYZ4RTsNHasAMVAKe/faq/connect-to-azure-docker-registry).
 
 ## Test automation
 
@@ -95,19 +95,14 @@ In this case, the app connects directly to the server. There is no intermediate 
 
 :white_check_mark: **Linux**: this case is covered by the automated tests.
 
-:white_check_mark: **MacOS**: follow the instructions below.
-
-1. Start the server with `npm run docker:server`.
-1. Start the application with `npm run test:app:direct`. It should render all connections with a green background.
-
-:white_check_mark: **Windows**: follow the instructions below.
+:white_check_mark: **MacOS**, :white_check_mark: **Windows**: follow the instructions below.
 
 1. Start the server with `npm run docker:server`.
 1. Start the application with `npm run test:app:direct`. It should render all connections with a green background.
 
 ## Test integration with OS settings
 
-The test cases that are described in this section cover the integration with the OS trust store (for self-signed-certificates) and network settings (for proxies).
+The test cases that are described in this section cover the integration with the OS trust store (for validating self-signed-certificates) and network settings (for detecting proxies).
 
 ### [OS] Test connection involving a self-signed certificate
 
@@ -315,8 +310,7 @@ In this case, the app connects to the server through a proxy that has been confi
 
 :white_check_mark: **Linux**: this case is covered by the automated tests.
 
-:white_check_mark: **MacOS**: follow the instructions below.
-:white_check_mark: **Windows**: follow the instructions below.
+:white_check_mark: **MacOS**, :white_check_mark: **Windows**: follow the instructions below.
 
 1. Start the server with `npm run docker:server`.
 1. Start the application with `npm run test:app:custom-proxy`. It should render all connections with a green background.
