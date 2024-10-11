@@ -105,7 +105,11 @@ In this case, the app connects directly to the server. There is no intermediate 
 1. Start the server with `npm run docker:server`.
 1. Start the application with `npm run test:app:direct`. It should render all connections with a green background.
 
-## Test connection involving a self-signed certificate
+## Test integration with OS settings
+
+The test cases that are described in this section cover the integration with the OS trust store (for self-signed-certificates) and network settings (for proxies).
+
+### [OS] Test connection involving a self-signed certificate
 
 For a certificate to be considered valid, it must be signed by a trusted certificate authority (CA), such as *GlobalSign* or *DigiCert*.
 Obtaining such a certificate used to cost some money (this is not true anymore thanks to *[Let's Encrypt](https://letsencrypt.org/)*, a nonprofit certificate authority).
@@ -138,9 +142,9 @@ To be able to use self-signed certificates, an organization must add itself to t
 1. Start the application with `npm run test:app:cert`. It should render all connections with a green background.
 1. [Optional] You can remove the certificate using the *Windows Certificate Manager* (search for `certmgr.msc` in the *Start* menu).
 
-## Test connection through a proxy
+### [OS] Test connection through a proxy
 
-In this case, the app connects to the server through a proxy.
+In this case, the app connects to the server through a proxy that has been configured in the OS.
 
 :white_check_mark: **Linux**: this case is covered by the automated tests. Note that the proxy is configured through the environment variables `HTTP_PROXY` and `HTTPS_PROXY`, which is the standard way of configuring proxies in Linux.
 
@@ -172,9 +176,9 @@ In this case, the app connects to the server through a proxy.
 1. Start the application with `npm run test:app:proxy`. It should render all connections with a green background.
 1. Turn off the proxy.
 
-## Test connection through a proxy that requires basic authentication
+### [OS] Test connection through a proxy that requires basic authentication
 
-In this case, the app connects to the server through a proxy that requires a username and a password. Even though the credentials might have been set at the level of the operating system, the user needs to provide them interactively to the Electron application. Note that this is also the case for other apps such as Slack or Docker Desktop.
+In this case, the app connects to the server through a proxy that has been configured in the OS. That proxy requires a username and a password. Even though the username and the password might have been set at the level of the operating system, the user needs to provide them interactively to the Electron application. It is also the case for other apps such as Slack or Docker Desktop.
 
 The `main` process must handle the [login](https://www.electronjs.org/docs/latest/api/app#event-login) event and prompt the user for the proxy credentials.
 
@@ -239,7 +243,9 @@ utilityProcess.fork(..., { respondToAuthRequestsFromMainProcess: true });
 1. Start the application with `npm run test:app:proxy-basic-auth`. It should render all connections with a green background. Note that you won't be prompted for credentials because we hardcoded them.
 1. Turn off the proxy. Delete the Windows credential that you created.
 
-## Test connection through a proxy configured via a PAC file
+### [OS] Test connection through a proxy configured via a PAC file
+
+In this case, the app connects to the server through the proxy that is returned by a PAC file that has been configured in the OS.
 
 :warning: **Linux**: PAC files are not natively supported by Linux, aka you cannot set `HTTP_PROXY` or `HTTPS_PROXY` to the URL of a PAC file. Linux requires the application itself to provide support for PAC files. That's because PAC files were originally meant to be used by browsers (see [here](https://en.wikipedia.org/wiki/Proxy_auto-config)). That's why they are JavaScript files.
 
@@ -266,7 +272,7 @@ utilityProcess.fork(..., { respondToAuthRequestsFromMainProcess: true });
 1. Start the application with `npm run test:app:proxy-pac-file`. It should render all connections with a green background.
 1. Turn off the proxy.
 
-## Test connection through a proxy that performs HTTPS inspection
+### [OS] Test connection through a proxy that performs HTTPS inspection
 
 [HTTPS inspection](https://www.cloudflare.com/en-gb/learning/security/what-is-https-inspection) is the process of checking encrypted web traffic. It relies on a proxy that sets up two separate encrypted connections:
 
@@ -298,3 +304,41 @@ Note that the proxy can use a self-signed certificate. This means that establish
 1. Click on *Next* until you complete the installation process.
 1. Start the application with `test:app:proxy-https-inspection`. It should render all connections with a green background.
 1. [Optional] You can remove the certificate using the *Windows Certificate Manager* (search for `certmgr.msc` in the *Start* menu).
+
+## Test custom application settings
+
+The test cases that are described in this section cover the configuration of custom network settings in the application itself.
+
+### [APP] Test connection through a proxy
+
+In this case, the app connects to the server through a proxy that has been configured in the app itself.
+
+:white_check_mark: **Linux**: this case is covered by the automated tests.
+
+:white_check_mark: **MacOS**: follow the instructions below.
+:white_check_mark: **Windows**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Start the application with `npm run test:app:custom-proxy`. It should render all connections with a green background.
+
+### [APP] Test connection through a proxy that requires basic authentication
+
+In this case, the app connects to the server through a proxy that has been configured in the app itself. That proxy requires a username and a password.
+
+:white_check_mark: **Linux**: this case is covered by the automated tests.
+
+:white_check_mark: **MacOS**, :white_check_mark: **Windows**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Start the application with `npm run test:app:custom-proxy-basic-auth`. It should render all connections with a green background.
+
+### [APP] Test connection through a proxy configured via a PAC file
+
+In this case, the app connects to the server through the proxy that is returned by a PAC file that has been configured in the app itself.
+
+:white_check_mark: **Linux**: this case is covered by the automated tests.
+
+:white_check_mark: **MacOS**, :white_check_mark: **Windows**: follow the instructions below.
+
+1. Start the server with `npm run docker:server`.
+1. Start the application with `npm run test:app:custom-proxy-pac-file`. It should render all connections with a green background.
