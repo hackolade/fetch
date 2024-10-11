@@ -15,7 +15,10 @@
   const serverApiUrl = params.get('serverApiUrl');
   document.getElementById('title').textContent = `ENDPOINT: ${serverApiUrl}`;
   try {
-    await hckFetch(`${serverApiUrl}/renderer`, { method: 'PUT' });
+    const response = await hckFetch(`${serverApiUrl}/renderer`, { method: 'PUT' });
+    if (!response.ok) {
+      throw new Error(`HTTP #${response.status}`);
+    }
     const result = { process: 'renderer', isSuccess: true };
     renderHckFetchResult(result);
     sendHckFetchResult(result);

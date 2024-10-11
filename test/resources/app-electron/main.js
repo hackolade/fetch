@@ -93,7 +93,10 @@ app.whenReady().then(async () => {
       renderResult: renderHckFetchResult.bind(this, window),
     });
     try {
-      await hckFetch(`${SERVER_API_URL}/main`, { method: 'PUT' });
+      const response = await hckFetch(`${SERVER_API_URL}/main`, { method: 'PUT' });
+      if (!response.ok) {
+        throw new Error(`HTTP #${response.status}`);
+      }
       renderHckFetchResult(window, { process: 'main', isSuccess: true });
     } catch (error) {
       renderHckFetchResult(window, { process: 'main', isSuccess: false });
