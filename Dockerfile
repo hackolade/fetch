@@ -69,7 +69,7 @@ EOF
 
 # Start test server
 FROM hck-fetch-runtime AS hck-fetch-test-server
-CMD [ "npm", "run", "test:server" ]
+ENTRYPOINT [ "npm", "run", "test:server" ]
 
 # Start tests
 FROM hck-fetch-runtime AS hck-fetch-tests

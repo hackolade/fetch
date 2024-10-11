@@ -81,12 +81,12 @@ See next sections for more details...
 |**OS SETTINGS**|||||
 |Self-signed certificate|:white_check_mark:|:white_check_mark:|:white_check_mark:||
 |Proxy|:white_check_mark:|:white_check_mark:|:white_check_mark:||
-|Proxy with basic auth|:white_check_mark:|:warning:|:white_check_mark:|['login' event](https://www.electronjs.org/docs/latest/api/app#event-login) not emitted for `main` process|
+|Proxy with basic auth|:white_check_mark:|:warning:|:warning:|['login' event](https://www.electronjs.org/docs/latest/api/app#event-login) not emitted for `main` process|
 |PAC file|:warning:|:white_check_mark:|:white_check_mark:|Not natively supported by the Linux OS|
 |Proxy with HTTPS inspection|:white_check_mark:|:white_check_mark:|:white_check_mark:||
 |**APP SETTINGS**|||||
 |Proxy|:white_check_mark:|:white_check_mark:|:white_check_mark:||
-|Proxy with basic auth|:white_check_mark:|:warning:|:white_check_mark:|['login' event](https://www.electronjs.org/docs/latest/api/app#event-login) not emitted for `main` process|
+|Proxy with basic auth|:white_check_mark:|:warning:|:warning:|['login' event](https://www.electronjs.org/docs/latest/api/app#event-login) not emitted for `main` process|
 |PAC file|:white_check_mark:|:white_check_mark:|:white_check_mark:||
 
 ## Test direct connection
@@ -310,12 +310,7 @@ In this case, the app connects to the server through a proxy that has been confi
 
 :white_check_mark: **Linux**: this case is covered by the automated tests.
 
-:white_check_mark: **MacOS**: follow the instructions below.
-
-1. Start the server with `npm run docker:server`.
-1. Start the application with `npm run test:app:custom-proxy`. It should render all connections with a green background.
-
-:white_check_mark: **Windows**: follow the instructions below.
+:white_check_mark: **MacOS**, :white_check_mark: **Windows**: follow the instructions below.
 
 1. Start the server with `npm run docker:server`.
 1. Start the application with `npm run test:app:custom-proxy`. It should render all connections with a green background.
@@ -326,12 +321,7 @@ In this case, the app connects to the server through a proxy that has been confi
 
 :white_check_mark: **Linux**: this case is covered by the automated tests.
 
-:warning: **MacOS**: follow the instructions below. Note that the server cannot be contacted from the `main` process because [the 'login' event](https://www.electronjs.org/docs/latest/api/app#event-login) is not emitted for that process, which ultimately leads to a `HTTP #407 Proxy Authentication Required`.
-
-1. Start the server with `npm run docker:server`.
-1. Start the application with `npm run test:app:custom-proxy-basic-auth`. It should render all connections with a green background.
-
-:white_check_mark: **Windows**: follow the instructions below.
+:warning: **MacOS**, :warning: **Windows**: follow the instructions below. Note that the server cannot be contacted from the `main` process because [the 'login' event](https://www.electronjs.org/docs/latest/api/app#event-login) is not emitted for that process, which ultimately leads to a `HTTP #407 Proxy Authentication Required`.
 
 1. Start the server with `npm run docker:server`.
 1. Start the application with `npm run test:app:custom-proxy-basic-auth`. It should render all connections with a green background.
@@ -342,12 +332,14 @@ In this case, the app connects to the server through the proxy that is returned 
 
 :white_check_mark: **Linux**: this case is covered by the automated tests.
 
-:white_check_mark: **MacOS**: follow the instructions below.
+:white_check_mark: **MacOS**, :white_check_mark: **Windows**: follow the instructions below.
 
 1. Start the server with `npm run docker:server`.
 1. Start the application with `npm run test:app:custom-proxy-pac-file`. It should render all connections with a green background.
 
-:white_check_mark: **Windows**: follow the instructions below.
+## Known Issues
 
-1. Start the server with `npm run docker:server`.
-1. Start the application with `npm run test:app:custom-proxy-pac-file`. It should render all connections with a green background.
+**I am on Windows and I get the error "$'\r': command not found"**
+
+This problem is related to line break differences between operating systems.
+To fix it, just save the [Dockerfile](./Dockerfile) using the LF line break (e.g. from the status bar in Visual Studio Code).
