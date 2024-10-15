@@ -307,6 +307,29 @@ The test cases that are described in this section cover the configuration of cus
 
 In this case, the app connects to the server through a proxy that has been configured in the app itself.
 
+The code below is used to apply the given proxy settings.
+
+```js
+// main.js
+const { app } = require('electron');
+
+function applyCustomProxySettings() {
+  // See https://www.electronjs.org/docs/latest/api/structures/proxy-config
+  const config = {...};
+
+  // Set proxy for main process and renderer processes
+  session.defaultSession.setProxy(config);
+
+  // Set proxy for utility process
+  app.setProxy(config);
+}
+
+app.whenReady().then(() => {
+    applyCustomProxySettings();
+    ...
+}):
+```
+
 :white_check_mark: **Linux**: this case is covered by the automated tests.
 
 :white_check_mark: **MacOS**, :white_check_mark: **Windows**: follow the instructions below.
