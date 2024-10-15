@@ -10,19 +10,19 @@ describe('@hackolade/fetch library', () => {
     assert.ok(didSendRequest, `The server did not receive any request from ${connectionType}/${initiator}!`);
   }
 
+  it('should reach the server from the main process through a direct connection', async () => {
+    await assertServerReachedFrom('direct', 'main');
+  });
+
+  it('should reach the server from the renderer process through a direct connection', async () => {
+    await assertServerReachedFrom('direct', 'renderer');
+  });
+
+  it('should reach the server from the utility process through a direct connection', async () => {
+    await assertServerReachedFrom('direct', 'utility');
+  });
+
   describe('OS settings', () => {
-    it('should reach the server from the main process through a direct connection', async () => {
-      await assertServerReachedFrom('direct', 'main');
-    });
-
-    it('should reach the server from the renderer process through a direct connection', async () => {
-      await assertServerReachedFrom('direct', 'renderer');
-    });
-
-    it('should reach the server from the utility process through a direct connection', async () => {
-      await assertServerReachedFrom('direct', 'utility');
-    });
-
     it('should reach the server that uses a self-signed certificate from the main process through a direct connection', async () => {
       await assertServerReachedFrom('cert', 'main');
     });
@@ -73,6 +73,18 @@ describe('@hackolade/fetch library', () => {
   });
 
   describe('App settings', () => {
+    it('should reach the server that uses a self-signed certificate from the main process through a direct connection', async () => {
+      await assertServerReachedFrom('custom-cert', 'main');
+    });
+
+    it('should reach the server that uses a self-signed certificate from the renderer process through a direct connection', async () => {
+      await assertServerReachedFrom('custom-cert', 'renderer');
+    });
+
+    it('should reach the server that uses a self-signed certificate from the utility process through a direct connection', async () => {
+      await assertServerReachedFrom('custom-cert', 'utility');
+    });
+
     it('should reach the server from the main process through a proxy', async () => {
       await assertServerReachedFrom('custom-proxy', 'main');
     });

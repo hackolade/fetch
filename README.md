@@ -84,6 +84,7 @@ See next sections for more details...
 |PAC file|:warning:|:white_check_mark:|:white_check_mark:|Not natively supported by the Linux OS|
 |Proxy with HTTPS inspection|:white_check_mark:|:white_check_mark:|:white_check_mark:||
 |**APP SETTINGS**|||||
+|Self-signed certificate|:white_check_mark:|:warning:|:warning:|[setCertificateVerifyProc()](https://www.electronjs.org/docs/latest/api/session#sessetcertificateverifyprocproc) ignored by `utility` process|
 |Proxy|:white_check_mark:|:white_check_mark:|:white_check_mark:||
 |Proxy with basic auth|:white_check_mark:|:warning:|:warning:|['login' event](https://www.electronjs.org/docs/latest/api/app#event-login) not emitted for `main` process|
 |PAC file|:white_check_mark:|:white_check_mark:|:white_check_mark:||
@@ -303,32 +304,23 @@ Note that the proxy can use a self-signed certificate. This means that establish
 
 The test cases that are described in this section cover the configuration of custom network settings in the application itself.
 
+### [APP] Test connection involving a self-signed certificate
+
+In this case, the app connects to a server that uses a self-signed certificate.
+The corresponding certificate authority has not been installed in the trust store of the operating system: it is configured directly in the application.
+You can find [here](./test/resources/app-electron/custom-ca.js) the code that installs that certificate authority in the application.
+
+:white_check_mark: **Linux**: this case is covered by the automated tests.
+
+:warning: **MacOS**, :warning: **Windows**: follow the instructions below. Note that the server cannot be contacted from the `utility` process because it ignores the custom procedure that we set for verifying the certificate (see [session.setCertificateVerifyProc()](https://www.electronjs.org/docs/latest/api/session#sessetcertificateverifyprocproc)).
+
+1. Start the server with `npm run docker:server`.
+1. Start the application with `npm run test:app:custom-cert`. It should render all connections with a green background, except for the `utility` process.
+
 ### [APP] Test connection through a proxy
 
 In this case, the app connects to the server through a proxy that has been configured in the app itself.
-
-The code below is used to apply the given proxy settings.
-
-```js
-// main.js
-const { app } = require('electron');
-
-function applyCustomProxySettings() {
-  // See https://www.electronjs.org/docs/latest/api/structures/proxy-config
-  const config = {...};
-
-  // Set proxy for main process and renderer processes
-  session.defaultSession.setProxy(config);
-
-  // Set proxy for utility process
-  app.setProxy(config);
-}
-
-app.whenReady().then(() => {
-    applyCustomProxySettings();
-    ...
-}):
-```
+You can find [here](./test/resources/app-electron/custom-proxy.js) the code that applies the given proxy settings.
 
 :white_check_mark: **Linux**: this case is covered by the automated tests.
 
@@ -346,7 +338,7 @@ In this case, the app connects to the server through a proxy that has been confi
 :warning: **MacOS**, :warning: **Windows**: follow the instructions below. Note that the server cannot be contacted from the `main` process because [the 'login' event](https://www.electronjs.org/docs/latest/api/app#event-login) is not emitted for that process, which ultimately leads to a `HTTP #407 Proxy Authentication Required`.
 
 1. Start the server with `npm run docker:server`.
-1. Start the application with `npm run test:app:custom-proxy-basic-auth`. It should render all connections with a green background.
+1. Start the application with `npm run test:app:custom-proxy-basic-auth`. It should render all connections with a green background, except for the `main` process.
 
 ### [APP] Test connection through a proxy configured via a PAC file
 

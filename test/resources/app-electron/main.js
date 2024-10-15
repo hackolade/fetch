@@ -2,6 +2,8 @@ const debug = require('debug');
 const { app, BrowserWindow, ipcMain, session, utilityProcess } = require('electron');
 const express = require('express');
 const path = require('path');
+const { installCustomCertificateAuthorities } = require('./custom-ca');
+const { applyCustomProxySettings } = require('./custom-proxy');
 const { hckFetch } = require('../../../dist/cjs/index.cjs');
 
 app.commandLine.appendSwitch('disable-gpu');
@@ -12,10 +14,6 @@ const log = debug('hck-fetch').extend('test-app');
 
 const PROXY_USERNAME = 'user1';
 const PROXY_PASSWORD = PROXY_USERNAME;
-
-// Optional environment variables for manual proxy settings
-const CUSTOM_PROXY_RULES = process.env.CUSTOM_PROXY_RULES;
-const CUSTOM_PROXY_PAC_SCRIPT = process.env.CUSTOM_PROXY_PAC_SCRIPT;
 
 const PORT = Number.parseInt(process.env.PORT);
 if (!PORT) {
@@ -67,26 +65,10 @@ async function createWindow() {
   return window;
 }
 
-function applyCustomProxySettings() {
-  if (!CUSTOM_PROXY_RULES && !CUSTOM_PROXY_PAC_SCRIPT) {
-    return;
-  }
-  // See https://www.electronjs.org/docs/latest/api/structures/proxy-config
-  const config = {
-    proxyRules: CUSTOM_PROXY_RULES,
-    pacScript: CUSTOM_PROXY_PAC_SCRIPT,
-  };
-
-  // Set proxy for main process and renderer processes
-  session.defaultSession.setProxy(config);
-
-  // Set proxy for utility process
-  app.setProxy(config);
-}
-
 app.whenReady().then(async () => {
   try {
-    applyCustomProxySettings();
+    applyCustomProxySettings({ app, session });
+    installCustomCertificateAuthorities({ session });
     const window = await createWindow();
     await fetchFromUtilityProcess({
       logResult: logHckFetchResult.bind(this),

@@ -149,11 +149,19 @@ services:
       - HTTP_PROXY=http://localhost:3130
       - HTTPS_PROXY=http://localhost:3130
 
-  app-custom-proxy:
+  app-custom-self-signed-cert:
     <<: *app
     profiles: [test]
     environment:
       - PORT=3006
+      - SERVER_API_URL=https://localhost:4443/initiators/custom-cert
+      - CUSTOM_CA=OK
+
+  app-custom-proxy:
+    <<: *app
+    profiles: [test]
+    environment:
+      - PORT=3007
       - SERVER_API_URL=http://server:8080/initiators/custom-proxy
       - CUSTOM_PROXY_RULES=localhost:3128
 
@@ -161,7 +169,7 @@ services:
     <<: *app
     profiles: [test]
     environment:
-      - PORT=3007
+      - PORT=3008
       - SERVER_API_URL=http://server:8080/initiators/custom-proxy-basic-auth
       - CUSTOM_PROXY_RULES=localhost:3129
 
@@ -169,7 +177,7 @@ services:
     <<: *app
     profiles: [test]
     environment:
-      - PORT=3008
+      - PORT=3009
       - SERVER_API_URL=http://server:8080/initiators/custom-proxy-pac-file
       - CUSTOM_PROXY_PAC_SCRIPT=http://127.0.0.1:8081/proxy.pac
 
@@ -192,6 +200,8 @@ services:
       app-proxy-basic-auth:
         condition: service_healthy
       app-proxy-https-inspection:
+        condition: service_healthy
+      app-custom-self-signed-cert:
         condition: service_healthy
       app-custom-proxy:
         condition: service_healthy
