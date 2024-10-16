@@ -80,13 +80,13 @@ See next sections for more details...
 |**OS SETTINGS**|||||
 |Self-signed certificate|:white_check_mark:|:white_check_mark:|:white_check_mark:||
 |Proxy|:white_check_mark:|:white_check_mark:|:white_check_mark:||
-|Proxy with basic auth|:white_check_mark:|:warning:|:warning:|['login' event](https://www.electronjs.org/docs/latest/api/app#event-login) not emitted for `main` process|
+|Proxy with basic auth|:white_check_mark:|:warning:|:warning:|['login' event](https://www.electronjs.org/docs/latest/api/app#event-login) not emitted for `main` process (see [issue #44249](https://github.com/electron/electron/issues/44249))|
 |PAC file|:warning:|:white_check_mark:|:white_check_mark:|Not natively supported by the Linux OS|
 |Proxy with HTTPS inspection|:white_check_mark:|:white_check_mark:|:white_check_mark:||
 |**APP SETTINGS**|||||
-|Self-signed certificate|:white_check_mark:|:warning:|:warning:|[setCertificateVerifyProc()](https://www.electronjs.org/docs/latest/api/session#sessetcertificateverifyprocproc) ignored by `utility` process|
+|Self-signed certificate|:white_check_mark:|:warning:|:warning:|[setCertificateVerifyProc()](https://www.electronjs.org/docs/latest/api/session#sessetcertificateverifyprocproc) ignored by `utility` process (see [issue #44264](https://github.com/electron/electron/issues/44264))|
 |Proxy|:white_check_mark:|:white_check_mark:|:white_check_mark:||
-|Proxy with basic auth|:white_check_mark:|:warning:|:warning:|['login' event](https://www.electronjs.org/docs/latest/api/app#event-login) not emitted for `main` process|
+|Proxy with basic auth|:white_check_mark:|:warning:|:warning:|['login' event](https://www.electronjs.org/docs/latest/api/app#event-login) not emitted for `main` process (see [issue #44249](https://github.com/electron/electron/issues/44249))|
 |PAC file|:white_check_mark:|:white_check_mark:|:white_check_mark:||
 
 ## Test direct connection
