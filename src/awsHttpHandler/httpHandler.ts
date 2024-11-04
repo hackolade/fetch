@@ -2,8 +2,11 @@ import { hckFetch } from '../index';
 import { requestTimeout } from './requestTimeout';
 import { isEmpty } from './isEmpty';
 
+type LogHandler = (...content: unknown[]) => string;
+
 export type Logger = {
-  log: (...content: unknown[]) => string;
+  log?: LogHandler;
+  info?: LogHandler;
 };
 
 export type HttpHandlerConstructor = {
@@ -68,7 +71,7 @@ export class HttpHandler {
 
     const fetchRequest = new Request(url, requestOptions);
 
-    this.logger?.log('info', { fetchRequest }, 'Http request details');
+    this.log('info', { fetchRequest }, 'Http request details');
 
     const resultResolver = async (result: any) => {
       const fetchHeaders = result.headers;
@@ -102,5 +105,12 @@ export class HttpHandler {
     }
 
     return Promise.race(race);
+  }
+
+  log(...payload: Parameters<LogHandler>) {
+    const method = this.logger?.log || this.logger?.info;
+    if (method) {
+      method(payload);
+    }
   }
 }
