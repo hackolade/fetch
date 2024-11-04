@@ -34,7 +34,9 @@
   "repository": "github:hackolade/fetch",
   "scripts": {
     "prebuild": "rimraf ./dist",
-    "build": "swc -C module.type=es6 ./src -d ./dist/esm --out-file-extension mjs --ignore **/*.d.ts && swc -C module.type=commonjs ./src -d ./dist/cjs --out-file-extension cjs --ignore **/*.d.ts",
+    "build:esm": "swc -C module.type=es6 ./src -d ./dist/esm --out-file-extension mjs --ignore **/*.d.ts ",
+    "build:cjs": "swc -C module.type=commonjs ./src -d ./dist/cjs --out-file-extension cjs --ignore **/*.d.ts",
+    "build": "npm run build:esm && npm run build:cjs",
     "docker:compose": "docker compose --profile=test up --build --force-recreate --always-recreate-deps --remove-orphans",
     "docker:server": "npm run docker:compose -- server",
     "docker:server:verbose": "npm run docker:compose -- --attach-dependencies server",
