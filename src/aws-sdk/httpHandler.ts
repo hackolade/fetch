@@ -1,4 +1,4 @@
-import { FetchHttpHandler } from '@aws-sdk/fetch-http-handler';
+import { FetchHttpHandler } from '@smithy/fetch-http-handler';
 import { hckFetch } from '../index';
 import { isEmpty } from './utils/isEmpty';
 

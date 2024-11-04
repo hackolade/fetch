@@ -60,7 +60,7 @@
     "**/*": "prettier --write --ignore-unknown"
   },
   "peerDependencies": {
-    "@aws-sdk/fetch-http-handler": "^3.374.0"
+    "@smithy/fetch-http-handler": "^4.0.0"
   },
   "devDependencies": {
     "@swc/cli": "0.4.0",
