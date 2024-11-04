@@ -2,12 +2,16 @@
   "name": "@hackolade/fetch",
   "version": "1.0.1",
   "description": "A HTTP client that works in the browser and in Electron",
-  "main": "./dist/cjs/index.cjs",
-  "module": "./dist/esm/index.mjs",
+  "main": "./dist/cjs/src/index.cjs",
+  "module": "./dist/esm/src/index.mjs",
   "exports": {
     ".": {
-      "import": "./dist/esm/index.mjs",
-      "require": "./dist/cjs/index.cjs"
+      "import": "./dist/esm/src/index.mjs",
+      "require": "./dist/cjs/src/index.cjs"
+    },
+    "./src/aws-sdk/httpHandler": {
+      "import": "./dist/esm/src/aws-sdk/httpHandler.mjs",
+      "require": "./dist/cjs/src/aws-sdk/httpHandler.cjs"
     }
   },
   "types": "./src/index.d.ts",
@@ -55,8 +59,10 @@
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
   },
+  "peerDependencies": {
+    "@aws-sdk/fetch-http-handler": "^3.374.0"
+  },
   "devDependencies": {
-    "@aws-sdk/fetch-http-handler": "3.374.0",
     "@swc/cli": "0.4.0",
     "@swc/core": "1.7.26",
     "cross-env": "7.0.3",
