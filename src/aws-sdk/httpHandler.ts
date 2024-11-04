@@ -1,17 +1,18 @@
+import { FetchHttpHandler } from '@aws-sdk/fetch-http-handler';
 import { hckFetch } from '../index';
-import { requestTimeout } from './requestTimeout';
-import { isEmpty } from './isEmpty';
+import { isEmpty } from './utils/isEmpty';
 
-type LogHandler = (...content: unknown[]) => string;
+type LogFn = (message: string, ...params: unknown[]) => void;
 
-export type Logger = {
-  log?: LogHandler;
-  info?: LogHandler;
+type Logger = {
+  debug?: LogFn;
+  info?: LogFn;
+  warn?: LogFn;
 };
 
-export type HttpHandlerConstructor = {
+type HttpHandlerConstructorParams = {
   requestTimeout?: number;
-  logger?: Logger;
+  logger: Logger;
 };
 
 type RequestOptions = {
@@ -21,11 +22,12 @@ type RequestOptions = {
   signal?: AbortSignal;
 };
 
-export class HttpHandler {
-  requestTimeout?: HttpHandlerConstructor['requestTimeout'];
-  logger?: Logger;
+export class HttpHandler extends FetchHttpHandler {
+  requestTimeout?: HttpHandlerConstructorParams['requestTimeout'];
+  logger: Logger;
 
-  constructor({ requestTimeout, logger }: HttpHandlerConstructor = {}) {
+  constructor({ requestTimeout, logger }: HttpHandlerConstructorParams) {
+    super({ requestTimeout });
     this.requestTimeout = requestTimeout;
     this.logger = logger;
   }
@@ -65,52 +67,41 @@ export class HttpHandler {
       method,
     };
 
-    if (typeof AbortController !== 'undefined') {
-      requestOptions.signal = abortSignal;
+    const fetchRequest = new Request(url, requestOptions);
+    this.logger.info?.('Http request details', { fetchRequest });
+
+    let timeout: NodeJS.Timeout | undefined;
+    if (!abortSignal && this.requestTimeout) {
+      const controller = new AbortController();
+      requestOptions.signal = controller.signal;
+      timeout = setTimeout(() => controller!.abort(), this.requestTimeout);
     }
 
-    const fetchRequest = new Request(url, requestOptions);
-
-    this.log('info', { fetchRequest }, 'Http request details');
-
-    const resultResolver = async (result: any) => {
-      const fetchHeaders = result.headers;
+    try {
+      const result = await hckFetch(fetchRequest);
       const transformedHeaders: Record<string, string> = {};
 
-      for (const [key, value] of fetchHeaders.entries()) {
+      for (const [key, value] of result.headers) {
         transformedHeaders[key] = value;
       }
-
-      const hasReadableStream = result.body !== undefined;
 
       const response = {
         headers: transformedHeaders,
         statusCode: result.status,
-        body: hasReadableStream ? result.body : await result.blob(),
+        body: result.body || (await result.blob()),
       };
 
       return { response };
-    };
-
-    const race = [hckFetch(fetchRequest).then(resultResolver), requestTimeout({ requestTimeout: this.requestTimeout })];
-
-    if (abortSignal) {
-      race.push(
-        new Promise((_, reject) => {
-          abortSignal.onabort = () => {
-            reject(this.getAbortError());
-          };
-        }),
-      );
-    }
-
-    return Promise.race(race);
-  }
-
-  log(...payload: Parameters<LogHandler>) {
-    const method = this.logger?.log || this.logger?.info;
-    if (method) {
-      method(payload);
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        this.logger.warn?.('Request was aborted');
+        throw this.getAbortError();
+      }
+      throw error;
+    } finally {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
     }
   }
 }
