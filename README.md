@@ -17,6 +17,10 @@ This library returns the proper implementation of *fetch()* depending on the run
 - it returns the native [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) in a browser, as well as in a Electron `renderer` process
 - it returns [net.fetch](https://www.electronjs.org/docs/latest/api/net#netfetchinput-init) in the Electron `main` and `utility` processes
 
+This library also provides extensions to modular SDK's that allow setting a custom HTTP client:
+
+- it provides a custom `HttpHandler` for the aws-sdk (see example [here](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/node-registering-certs.html))
+
 ## Release process
 
 1. Open a pull request to bump the semantic `version` in [package.json](./package.json).
