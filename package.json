@@ -2,16 +2,12 @@
   "name": "@hackolade/fetch",
   "version": "1.0.1",
   "description": "A HTTP client that works in the browser and in Electron",
-  "main": "./dist/cjs/src/index.cjs",
-  "module": "./dist/esm/src/index.mjs",
+  "main": "./dist/cjs/index.cjs",
+  "module": "./dist/esm/index.mjs",
   "exports": {
     ".": {
-      "import": "./dist/esm/src/index.mjs",
-      "require": "./dist/cjs/src/index.cjs"
-    },
-    "./src/aws-sdk/httpHandler": {
-      "import": "./dist/esm/src/aws-sdk/httpHandler.mjs",
-      "require": "./dist/cjs/src/aws-sdk/httpHandler.cjs"
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.cjs"
     }
   },
   "types": "./src/index.d.ts",
