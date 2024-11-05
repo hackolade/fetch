@@ -10,8 +10,8 @@ import { hckFetch } from './hckFetch';
  * that's ultimately responsible for sending the HTTP requests. This module exports a factory function that creates a
  * request handler that uses the Electron-aware hckFetch() instead of fetch().
  */
-export function hckFetchAwsSdkHttpHandler(): FetchHttpHandler {
-  return new HckFetchAwsSdkHttpHandler();
+export function hckFetchAwsSdkHttpHandler(options?: FetchHttpHandlerOptions): FetchHttpHandler {
+  return new HckFetchAwsSdkHttpHandler(options);
 }
 
 /**
@@ -67,7 +67,7 @@ class HckFetchAwsSdkHttpHandler extends FetchHttpHandler {
       credentials,
     };
 
-    // cache property is not supported in workerd runtime
+    // cache property is not supported in worker runtime
     if (this.options?.cache) {
       requestOptions.cache = this.options.cache;
     }
@@ -130,7 +130,7 @@ class HckFetchAwsSdkHttpHandler extends FetchHttpHandler {
     ];
     if (abortSignal) {
       raceOfPromises.push(
-        new Promise<never>((resolve, reject) => {
+        new Promise<never>((_resolve, reject) => {
           const onAbort = () => {
             const abortError = new Error('Request aborted');
             abortError.name = 'AbortError';
@@ -153,7 +153,7 @@ class HckFetchAwsSdkHttpHandler extends FetchHttpHandler {
 }
 
 function requestTimeout(timeoutInMs = 0): Promise<never> {
-  return new Promise((resolve, reject) => {
+  return new Promise((_resolve, reject) => {
     if (timeoutInMs) {
       setTimeout(() => {
         const timeoutError = new Error(`Request did not complete within ${timeoutInMs} ms`);
