@@ -2,12 +2,12 @@
   "name": "@hackolade/fetch",
   "version": "1.0.1",
   "description": "A HTTP client that works in the browser and in Electron",
-  "main": "./dist/cjs/index.cjs",
-  "module": "./dist/esm/index.mjs",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
   "exports": {
     ".": {
-      "import": "./dist/esm/index.mjs",
-      "require": "./dist/cjs/index.cjs"
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
     }
   },
   "types": "./src/index.d.ts",
@@ -30,8 +30,8 @@
   "repository": "github:hackolade/fetch",
   "scripts": {
     "prebuild": "rimraf ./dist",
-    "build:esm": "swc -C module.type=es6 ./src -d ./dist/esm --out-file-extension mjs --ignore **/*.d.ts ",
-    "build:cjs": "swc -C module.type=commonjs ./src -d ./dist/cjs --out-file-extension cjs --ignore **/*.d.ts",
+    "build:esm": "swc -C module.type=es6 ./src -d ./dist/esm --ignore **/*.d.ts",
+    "build:cjs": "swc -C module.type=commonjs ./src -d ./dist/cjs --ignore **/*.d.ts",
     "build": "npm run build:esm && npm run build:cjs",
     "docker:compose": "docker compose --profile=test up --build --force-recreate --always-recreate-deps --remove-orphans",
     "docker:server": "npm run docker:compose -- server",
