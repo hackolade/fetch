@@ -1,5 +1,5 @@
 (async function () {
-  const { hckFetch } = require('../../../dist/cjs/index.cjs');
+  const { hckFetch } = require('../../../dist/cjs/index.js');
   const serverApiUrl = process.argv[2];
   try {
     const response = await hckFetch(`${serverApiUrl}/utility`, { method: 'PUT' });

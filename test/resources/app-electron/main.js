@@ -4,7 +4,7 @@ const express = require('express');
 const path = require('path');
 const { installCustomCertificateAuthorities } = require('./custom-ca');
 const { applyCustomProxySettings } = require('./custom-proxy');
-const { hckFetch } = require('../../../dist/cjs/index.cjs');
+const { hckFetch } = require('../../../dist/cjs/index.js');
 
 app.commandLine.appendSwitch('disable-gpu');
 app.commandLine.appendSwitch('enable-transparent-visuals');
