@@ -60,10 +60,15 @@ class HckFetchAwsSdkHttpHandler extends FetchHttpHandler {
     // Request constructor doesn't allow GET/HEAD request with body
     // @see https://github.com/whatwg/fetch/issues/551
     const body = method === 'GET' || method === 'HEAD' ? undefined : request.body;
+
+    const headers = new Headers(request.headers);
+    const headersToSkip = ['content-length', 'host'];
+    headersToSkip.forEach(header => headers.delete(header));
+
     const requestOptions: RequestInit & { duplex?: 'half' } = {
       body,
-      headers: new Headers(request.headers),
-      method: method,
+      headers,
+      method,
       credentials,
     };
 
