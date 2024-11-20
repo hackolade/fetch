@@ -81,13 +81,13 @@ See next sections for more details...
 ||Linux|MacOS|Windows|Notes|
 |-|-|-|-|-|
 |Direct connection|:white_check_mark:|:white_check_mark:|:white_check_mark:||
-|**OS SETTINGS**|||||
+|**OS SETTINGS**||||Test cases for proxy settings and certificate authorities from the OS|
 |Self-signed certificate|:white_check_mark:|:white_check_mark:|:white_check_mark:||
 |Proxy|:white_check_mark:|:white_check_mark:|:white_check_mark:||
 |Proxy with basic auth|:white_check_mark:|:warning:|:warning:|['login' event](https://www.electronjs.org/docs/latest/api/app#event-login) not emitted for `main` process (see [issue #44249](https://github.com/electron/electron/issues/44249))|
 |PAC file|:warning:|:white_check_mark:|:white_check_mark:|Not natively supported by the Linux OS|
 |Proxy with HTTPS inspection|:white_check_mark:|:white_check_mark:|:white_check_mark:||
-|**APP SETTINGS**|||||
+|**APP SETTINGS**||||Test cases for proxy settings and certificate authorities configured in the app|
 |Self-signed certificate|:white_check_mark:|:warning:|:warning:|[setCertificateVerifyProc()](https://www.electronjs.org/docs/latest/api/session#sessetcertificateverifyprocproc) ignored by `utility` process (see [issue #44264](https://github.com/electron/electron/issues/44264))|
 |Proxy|:white_check_mark:|:white_check_mark:|:white_check_mark:||
 |Proxy with basic auth|:white_check_mark:|:warning:|:warning:|['login' event](https://www.electronjs.org/docs/latest/api/app#event-login) not emitted for `main` process (see [issue #44249](https://github.com/electron/electron/issues/44249))|
@@ -361,3 +361,14 @@ In this case, the app connects to the server through the proxy that is returned 
 
 This problem is related to line break differences between operating systems.
 To fix it, just save the [Dockerfile](./Dockerfile) using the LF line break (e.g. from the status bar in Visual Studio Code).
+
+## Bug report
+
+When reporting [an issue in the Electron repository](https://github.com/electron/electron/issues), you need to provide a standalone test case that reproduces the problem.
+You can do this easily by using [Electron Fiddle](https://www.electronjs.org/fiddle).
+You can connect it to your GitHub account and easily upload a test case as a public [gist](https://docs.github.com/en/get-started/writing-on-github/editing-and-sharing-content-with-gists/creating-gists#about-gists) that you can then link from the GitHub issue that you are creating.
+
+Examples:
+
+- [Issue #44249](https://github.com/electron/electron/issues/44249#issuecomment-2483566332)
+- [Issue #44264](https://github.com/electron/electron/issues/44264#issuecomment-2483255046)
