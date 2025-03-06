@@ -25,7 +25,7 @@ This library also provides extensions to modular SDK's that allow setting a cust
 
 1. Open a pull request to bump the semantic `version` in [package.json](./package.json).
 1. Set the title of your pull request to `Release v<major>.<minor>.<patch>`.
-1. Document the content of the release in the description of your pull request.
+1. Document the content of the release in both the [CHANGELOG](./CHANGELOG.md) and the description of your pull request.
 1. Merge the pull request into the branch that you plan to release (`develop` typically).
 1. Trigger [the release workflow](https://github.com/hackolade/fetch/actions/workflows/release.yml) from the GitHub *Actions* for that branch. It will publish the library to the NPM registry as [@hackolade/fetch](https://www.npmjs.com/package/@hackolade/fetch). It will also create a [GitHub release](https://github.com/hackolade/fetch/releases) with the same description as the pull request you created.
 
@@ -354,6 +354,16 @@ In this case, the app connects to the server through the proxy that is returned 
 
 1. Start the server with `npm run docker:server`.
 1. Start the application with `npm run test:app:custom-proxy-pac-file`. It should render all connections with a green background.
+
+## Q&A
+
+### Why do I need to append the .js extension when importing and exporting relative TypeScript modules?
+
+TypeScript does not require you to specify the file extensions in imports and exports.
+However, the TypeScript code of this library is ultimately transpiled to both CommonJS and ESM.
+ESM requires imports and exports to be fully specified, aka to include the file extensions (see [here](https://nodejs.org/api/esm.html#mandatory-file-extensions)).
+The problem is that TypeScript transpilers do not modify imported and exported paths (see [here](https://github.com/swc-project/swc/issues/5346)).
+So the only workaround is to use the `.js` extension in the TypeScript imports and exports in order to be compliant with the ESM requirement (see [here](https://www.typescriptlang.org/docs/handbook/modules/appendices/esm-cjs-interop.html#different-module-resolution-algorithms)).
 
 ## Known Issues
 

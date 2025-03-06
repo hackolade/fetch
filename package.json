@@ -1,6 +1,6 @@
 {
   "name": "@hackolade/fetch",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A HTTP client that works in the browser and in Electron",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
@@ -30,9 +30,10 @@
   "repository": "github:hackolade/fetch",
   "scripts": {
     "prebuild": "rimraf ./dist",
-    "build:esm": "swc -C module.type=es6 ./src -d ./dist/esm --ignore **/*.d.ts --strip-leading-paths",
-    "build:cjs": "swc -C module.type=commonjs ./src -d ./dist/cjs --ignore **/*.d.ts --strip-leading-paths",
-    "build": "npm run build:esm && npm run build:cjs",
+    "build:esm:package": "echo '{ \"type\": \"module\" }' > ./dist/esm/package.json",
+    "build:esm": "swc ./src -d ./dist/esm --ignore **/*.d.ts --strip-leading-paths -C module.type=es6 -C module.ignoreDynamic=true",
+    "build:cjs": "swc ./src -d ./dist/cjs --ignore **/*.d.ts --strip-leading-paths -C module.type=commonjs -C module.ignoreDynamic=true",
+    "build": "npm run build:cjs && npm run build:esm && npm run build:esm:package",
     "docker:compose": "docker compose --profile=test up --build --force-recreate --always-recreate-deps --remove-orphans",
     "docker:server": "npm run docker:compose -- server",
     "docker:server:verbose": "npm run docker:compose -- --attach-dependencies server",

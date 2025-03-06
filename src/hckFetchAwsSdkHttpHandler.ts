@@ -3,7 +3,7 @@ import { HttpRequest, HttpResponse } from '@smithy/protocol-http';
 import { buildQueryString } from '@smithy/querystring-builder';
 import { HeaderBag, HttpHandlerOptions } from '@smithy/types';
 
-import { hckFetch } from './hckFetch';
+import { hckFetch } from './hckFetch.js';
 
 /**
  * The aws-sdk v3+ has a modular architecture that makes it possible to configure a request handler, aka the object
