@@ -1,3 +1,3 @@
-export * from './hckFetch';
+export * from './hckFetch.js';
 
-export * from './hckFetchAwsSdkHttpHandler';
+export * from './hckFetchAwsSdkHttpHandler.js';
