@@ -21,6 +21,20 @@ This library also provides extensions to modular SDK's that allow setting a cust
 
 - it provides a custom `HttpHandler` for the aws-sdk (see example [here](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/node-registering-certs.html))
 
+This library aims at being a drop-in replacement for node-fetch. node-fetch can be replaced by hackolade/fetch using [NPM overrides](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#overrides). In the example below, we replace node-fetch by hackolade-fetch for the BigQuery JavaScript client.
+
+```json
+"overrides": {
+  "@google-cloud/bigquery":{
+    "@google-cloud/common":{
+      "teeny-request":{
+        "node-fetch": "npm:@hackolade/fetch@1.2.0"
+      }
+    }
+  }
+}
+```
+
 ## Release process
 
 1. Open a pull request to bump the semantic `version` in [package.json](./package.json).
@@ -136,7 +150,7 @@ To be able to use self-signed certificates, an organization must add itself to t
 1. Start the server with `npm run docker:server`.
 1. Using the file explorer, double click on the certificate [./test/resources/certs/gen/rootCA.crt](./test/resources/certs/gen/rootCA.crt).
 1. Click on *Install certificate* in the details dialog.
-1. Click on *Next* until you have the option to select a store. Browser the available stores and select *Trusted Root Certification Authorities* (*Autorités de certification racines de confiance* in French).
+1. Click on *Next* until you have the option to select a store. Browse the available stores and select *Trusted Root Certification Authorities* (*Autorités de certification racines de confiance* in French).
 1. Click on *Next* until you complete the installation process.
 1. Start the application with `npm run test:app:cert`. It should render all connections with a green background.
 1. [Optional] You can remove the certificate using the *Windows Certificate Manager* (search for `certmgr.msc` in the *Start* menu).
@@ -299,7 +313,7 @@ Note that the proxy can use a self-signed certificate. This means that establish
 1. Start the server with `npm run docker:server`.
 1. Using the file explorer, double click on the certificate [./test/resources/certs/gen/rootCA.crt](./test/resources/certs/gen/rootCA.crt).
 1. Click on *Install certificate* in the details dialog.
-1. Click on *Next* until you have the option to select a store. Browser the available stores and select *Trusted Root Certification Authorities* (*Autorités de certification racines de confiance* in French).
+1. Click on *Next* until you have the option to select a store. Browse the available stores and select *Trusted Root Certification Authorities* (*Autorités de certification racines de confiance* in French).
 1. Click on *Next* until you complete the installation process.
 1. Start the application with `test:app:proxy-https-inspection`. It should render all connections with a green background.
 1. [Optional] You can remove the certificate using the *Windows Certificate Manager* (search for `certmgr.msc` in the *Start* menu).
