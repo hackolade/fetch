@@ -299,24 +299,42 @@ Note that the proxy can use a self-signed certificate. This means that establish
 :white_check_mark: **MacOS**: follow the instructions below.
 
 1. Start the server with `npm run docker:server`.
+1. Open the MacOS *System Settings*.
+1. Select *Network* in the left menu.
+1. Navigate to the details of your network connection.
+1. In the details dialog, select *Proxies*.
+1. Enable *Secure web proxy (HTTPS)* and provide the following settings:
+    - Server: *127.0.0.1*
+    - Port: *3130*
+    - No authentication required
+1. Click on *OK* to apply your changes.
 1. Open the MacOS *Keychain Access*.
 1. Click on *File* > *Import Items*.
 1. Select the certificate [./test/resources/certs/gen/rootCA.crt](./test/resources/certs/gen/rootCA.crt).
 1. Locate the certificate that you just imported in your keychain (search for *Hackolade-Test-Root-CA*) and double click on it.
 1. Expand the *Trust* section of the details dialog and choose to *Always Trust* the certificate for SSL.
 1. Close the details dialog to apply your changes.
-1. Start the application with `test:app:proxy-https-inspection`. It should render all connections with a green background.
-1. [Optional] You can remove the certificate from your keychain.
+1. Start the application with `npm run test:app:proxy-https-inspection`. It should render all connections with a green background.
+1. Turn off the proxy.
+1. Remove the certificate from your keychain.
 
 :white_check_mark: **Windows**: follow the instructions below.
 
 1. Start the server with `npm run docker:server`.
+1. Open the *Settings* app by pressing *Windows+I*.
+1. Select *Network & Internet* in the left menu.
+1. Navigate to the *Proxy* section.
+1. Configure a proxy manually with the following settings:
+    - Server: *127.0.0.1*
+    - Port: *3130*
+1. Click on *Save* to apply your changes.
 1. Using the file explorer, double click on the certificate [./test/resources/certs/gen/rootCA.crt](./test/resources/certs/gen/rootCA.crt).
 1. Click on *Install certificate* in the details dialog.
 1. Click on *Next* until you have the option to select a store. Browse the available stores and select *Trusted Root Certification Authorities* (*Autorités de certification racines de confiance* in French).
 1. Click on *Next* until you complete the installation process.
-1. Start the application with `test:app:proxy-https-inspection`. It should render all connections with a green background.
-1. [Optional] You can remove the certificate using the *Windows Certificate Manager* (search for `certmgr.msc` in the *Start* menu).
+1. Start the application with `npm run test:app:proxy-https-inspection`. It should render all connections with a green background.
+1. Turn off the proxy.
+1. Remove the certificate using the *Windows Certificate Manager* (search for `certmgr.msc` in the *Start* menu).
 
 ## Test custom application settings
 
