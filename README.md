@@ -136,7 +136,7 @@ To be able to use self-signed certificates, an organization must add itself to t
 1. Start the server with `npm run docker:server`.
 1. Using the file explorer, double click on the certificate [./test/resources/certs/gen/rootCA.crt](./test/resources/certs/gen/rootCA.crt).
 1. Click on *Install certificate* in the details dialog.
-1. Click on *Next* until you have the option to select a store. Browser the available stores and select *Trusted Root Certification Authorities* (*Autorités de certification racines de confiance* in French).
+1. Click on *Next* until you have the option to select a store. Browse the available stores and select *Trusted Root Certification Authorities* (*Autorités de certification racines de confiance* in French).
 1. Click on *Next* until you complete the installation process.
 1. Start the application with `npm run test:app:cert`. It should render all connections with a green background.
 1. [Optional] You can remove the certificate using the *Windows Certificate Manager* (search for `certmgr.msc` in the *Start* menu).
@@ -299,7 +299,7 @@ Note that the proxy can use a self-signed certificate. This means that establish
 1. Start the server with `npm run docker:server`.
 1. Using the file explorer, double click on the certificate [./test/resources/certs/gen/rootCA.crt](./test/resources/certs/gen/rootCA.crt).
 1. Click on *Install certificate* in the details dialog.
-1. Click on *Next* until you have the option to select a store. Browser the available stores and select *Trusted Root Certification Authorities* (*Autorités de certification racines de confiance* in French).
+1. Click on *Next* until you have the option to select a store. Browse the available stores and select *Trusted Root Certification Authorities* (*Autorités de certification racines de confiance* in French).
 1. Click on *Next* until you complete the installation process.
 1. Start the application with `test:app:proxy-https-inspection`. It should render all connections with a green background.
 1. [Optional] You can remove the certificate using the *Windows Certificate Manager* (search for `certmgr.msc` in the *Start* menu).
