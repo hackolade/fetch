@@ -21,16 +21,12 @@ This library also provides extensions to modular SDK's that allow setting a cust
 
 - it provides a custom `HttpHandler` for the aws-sdk (see example [here](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/node-registering-certs.html))
 
-This library aims at being a drop-in replacement for node-fetch. node-fetch can be replaced by hackolade/fetch using [NPM overrides](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#overrides). In the example below, we replace node-fetch by hackolade-fetch for the BigQuery JavaScript client.
+This library aims at being a drop-in replacement for node-fetch. node-fetch can be replaced by @hackolade/fetch using [NPM overrides](https://docs.npmjs.com/cli/v9/configuring-npm/package-json#overrides).
 
 ```json
 "overrides": {
-  "@google-cloud/bigquery":{
-    "@google-cloud/common":{
-      "teeny-request":{
-        "node-fetch": "npm:@hackolade/fetch@1.2.0"
-      }
-    }
+  "node-fetch": {
+    ".": "npm:@hackolade/fetch@1.2.2"
   }
 }
 ```
