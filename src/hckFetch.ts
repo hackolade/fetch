@@ -42,5 +42,9 @@ async function fetchUsingGlobalContext(params: FetchParameters): FetchReturnType
 }
 
 export function hckFetch(...params: FetchParameters): FetchReturnType {
-  return useElectronNet() ? fetchUsingElectronNet(params) : fetchUsingGlobalContext(params);
+  if (BROWSER_BUILD) {
+    return fetchUsingGlobalContext(params);
+  } else {
+    return useElectronNet() ? fetchUsingElectronNet(params) : fetchUsingGlobalContext(params);
+  }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@hackolade/fetch",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "A HTTP client that works in the browser and in Electron",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
@@ -31,9 +31,10 @@
   "scripts": {
     "prebuild": "rimraf ./dist",
     "build:esm:package": "echo '{ \"type\": \"module\" }' > ./dist/esm/package.json",
-    "build:esm": "swc ./src -d ./dist/esm --ignore **/*.d.ts --strip-leading-paths -C module.type=es6 -C module.ignoreDynamic=true",
-    "build:cjs": "swc ./src -d ./dist/cjs --ignore **/*.d.ts --strip-leading-paths -C module.type=commonjs -C module.ignoreDynamic=true",
-    "build": "npm run build:cjs && npm run build:esm && npm run build:esm:package",
+    "build:esm": "npx esbuild ./src/index.ts  --bundle --format=esm --tree-shaking=true --minify --outdir=./dist/esm --format=esm --platform=node --define:BROWSER_BUILD=false --external:electron",
+    "build:cjs": "npx esbuild ./src/index.ts  --bundle --format=cjs --tree-shaking=true --minify --outdir=./dist/cjs --format=cjs --platform=node --define:BROWSER_BUILD=false --external:electron",
+    "build:browser": "npx esbuild ./src/index.ts --bundle --format=esm --tree-shaking=true --minify --outdir=./dist/browser --platform=browser --define:BROWSER_BUILD=true --external:electron",
+    "build": "npm run build:cjs && npm run build:esm && npm run build:browser && npm run build:esm:package",
     "docker:compose": "docker compose --profile=test up --build --force-recreate --always-recreate-deps --remove-orphans",
     "docker:server": "npm run docker:compose -- server",
     "docker:server:verbose": "npm run docker:compose -- --attach-dependencies server",
@@ -59,16 +60,16 @@
     "**/*": "prettier --write --ignore-unknown"
   },
   "devDependencies": {
-    "@swc/cli": "0.4.0",
-    "@swc/core": "1.7.26",
     "cross-env": "7.0.3",
     "debug": "4.3.7",
-    "electron": "33.2.0",
-    "express": "4.21.1",
+    "electron": "36.2.0",
+    "esbuild": "0.25.4",
+    "express": "4.21.2",
     "husky": "9.1.6",
     "lint-staged": "15.2.10",
     "prettier": "3.3.3",
-    "rimraf": "6.0.1"
+    "rimraf": "6.0.1",
+    "typescript": "5.8.3"
   },
   "dependencies": {
     "@smithy/fetch-http-handler": "4.0.0",
