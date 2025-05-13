@@ -1,5 +1,5 @@
 (async function () {
-  const { hckFetch } = await import('../../../dist/esm/hckFetch.js');
+  const { hckFetch } = await import('../../../dist/esm/index.js');
   const { onHckFetchResult, sendHckFetchResult } = window.electronAPI;
 
   function renderHckFetchResult({ process, isSuccess }) {
