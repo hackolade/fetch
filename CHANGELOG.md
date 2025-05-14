@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Moved build to using Esbuild in order to be able to generate a dedicated entrypoint for Browser deployments without any reference/import to/of Electron dependency.
+- Migrated from SWC to esbuild in order to generate a dedicated entrypoint for browser deployments without any reference to Electron
 
 ## [1.2.1] - 2025-03-20
 
