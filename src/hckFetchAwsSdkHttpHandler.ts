@@ -1,4 +1,4 @@
-import { FetchHttpHandler, FetchHttpHandlerOptions, keepAliveSupport } from '@smithy/fetch-http-handler';
+import { FetchHttpHandler, type FetchHttpHandlerOptions, keepAliveSupport } from '@smithy/fetch-http-handler';
 import { HttpRequest, HttpResponse } from '@smithy/protocol-http';
 import { buildQueryString } from '@smithy/querystring-builder';
 import { HeaderBag, HttpHandlerOptions } from '@smithy/types';
