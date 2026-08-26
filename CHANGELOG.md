@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `types` condition to the package `exports` map so TypeScript consumers using `moduleResolution: bundler` can resolve declarations without a local shim
 - Added missing default export to `index.d.ts`
 
+### Changed
+
+- Bumped Electron test dependency from 36.2.0 to 43.4.1 to align with Hackolade Studio and close Dependabot advisories
+
 ## [1.3.0] - 2025-05-14
 
 ### Fixed
