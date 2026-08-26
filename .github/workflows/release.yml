@@ -6,13 +6,11 @@ on:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout source code
         uses: actions/checkout@v6
@@ -32,6 +30,7 @@ jobs:
       - name: Create GitHub release
         uses: actions/create-release@v1
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.package-version.outputs.current-version}}
         with:
           tag_name: ${{ env.VERSION }}
