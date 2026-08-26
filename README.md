@@ -26,7 +26,7 @@ This library aims at being a drop-in replacement for node-fetch. node-fetch can 
 ```json
 "overrides": {
   "node-fetch": {
-    ".": "npm:@hackolade/fetch@1.2.2"
+    ".": "npm:@hackolade/fetch@x.y.z"
   }
 }
 ```
