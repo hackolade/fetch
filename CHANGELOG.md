@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added `types` to package `exports` map
 - Added missing default export to `index.d.ts`
+- Fixed `repository` declaration in package.json
+- Fixed GitHub action for NPM publishing
 
 ### Changed
 
