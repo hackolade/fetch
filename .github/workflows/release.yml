@@ -13,9 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set up NodeJS
-        uses: hackolade/plugin-workflows/setup-node@v1
+        uses: hackolade/plugin-workflows/setup-node@8c551f5cfe0c43e9e29606b11c4eafab4e18a104 # v1.0.0
         with:
           registry-url: "https://registry.npmjs.org"
           package-manager-cache: false
@@ -25,9 +25,9 @@ jobs:
         run: npm publish
       - name: Extract package version
         id: package-version
-        uses: martinbeentjes/npm-get-version-action@v1.3.1
+        uses: martinbeentjes/npm-get-version-action@3cf273023a0dda27efcd3164bdfb51908dd46a5b # v1.3.1
       - name: Create GitHub release
-        uses: actions/create-release@v1
+        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.package-version.outputs.current-version}}
